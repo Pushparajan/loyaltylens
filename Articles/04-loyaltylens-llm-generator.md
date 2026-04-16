@@ -2,7 +2,7 @@
 title: "Prompt Engineering Is Software Engineering: Versioning, Testing, and Multimodal Extension"
 slug: "loyaltylens-llm-generator"
 description: "Building the LLM offer copy generator — versioned YAML prompt registry, dual LLM backends, JSON parse retry logic, and a CLIP brand alignment scorer."
-date: 2025-09-29
+date: 2026-05-19
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 4

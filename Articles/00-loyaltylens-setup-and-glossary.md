@@ -2,7 +2,7 @@
 title: "Before You Write a Single Line: The Complete Setup Guide and Glossary for LoyaltyLens"
 slug: "loyaltylens-setup-glossary"
 description: "Complete environment setup, mental model, and plain-English glossary for every acronym in the LoyaltyLens series — RAG, PSI, RLHF, LLMOps, and 33 more."
-date: 2025-09-01
+date: 2026-04-21
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 0
@@ -547,6 +547,6 @@ Each article is self-contained. The code builds on the previous module but each 
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect in IT consulting, leading AI strategy and delivery for Fortune 500 enterprises. He is based in the Greater Chicago Area.*
+*Pushparajan Ramar is an Enterprise Architect Director in enterprise consulting, leading AI strategy and delivery for Fortune 500 enterprises. He is based in the Greater Chicago Area.*
 
 *[LinkedIn](https://linkedin.com/in/pushparajanramar) · [pushparajan.tech](https://pushparajan.tech)*

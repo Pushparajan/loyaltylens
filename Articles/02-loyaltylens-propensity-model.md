@@ -2,7 +2,7 @@
 title: "Why I Used a Transformer (Not XGBoost) for Tabular Propensity Scoring"
 slug: "loyaltylens-propensity-model"
 description: "Building a production-grade offer redemption predictor with PyTorch — TabTransformer architecture, MLflow tracking, model cards, and the SageMaker deployment path."
-date: 2025-09-15
+date: 2026-05-05
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 2

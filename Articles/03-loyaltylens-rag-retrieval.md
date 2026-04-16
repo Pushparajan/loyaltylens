@@ -2,7 +2,7 @@
 title: "LangChain vs. LlamaIndex in Production: What the Benchmarks Actually Show"
 slug: "loyaltylens-rag-retrieval"
 description: "Building a RAG offer retrieval system — real latency and precision benchmarks comparing LangChain vs. LlamaIndex and pgvector vs. Weaviate at three catalog sizes."
-date: 2025-09-22
+date: 2026-05-12
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 3

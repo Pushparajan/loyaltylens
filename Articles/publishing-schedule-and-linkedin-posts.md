@@ -34,18 +34,20 @@ Here's why this specific slot — and not the "classic" 8–9 AM advice you'll s
 
 Blog articles should go live **the same day as the LinkedIn post**, ideally **30–60 minutes before** the LinkedIn post goes out. This way, when someone clicks your link, the article is already indexed and loading cleanly.
 
-| Week | Date (Tuesday) | Article | Blog Publish | LinkedIn Post |
-|---|---|---|---|---|
-| 1 | Week of start | Article 0 — Setup & Glossary | 3:00 PM CT | 4:00 PM CT |
-| 2 | +7 days | Article 1 — Feature Pipeline | 3:00 PM CT | 4:00 PM CT |
-| 3 | +14 days | Article 2 — Propensity Model | 3:00 PM CT | 4:00 PM CT |
-| 4 | +21 days | Article 3 — RAG Retrieval | 3:00 PM CT | 4:00 PM CT |
-| 5 | +28 days | Article 4 — LLM Generator | 3:00 PM CT | 4:00 PM CT |
-| 6 | +35 days | Article 5 — LLMOps Pipeline | 3:00 PM CT | 4:00 PM CT |
-| 7 | +42 days | Article 6 — RLHF Feedback Loop | 3:00 PM CT | 4:00 PM CT |
-| 8 | +49 days | Article 7 — Recap & Next Steps | 3:00 PM CT | 4:00 PM CT |
+| Week | Date | Article | Blog Publish (CT) | LinkedIn Post (CT) | Frontmatter Date |
+|---|---|---|---|---|---|
+| 1 | **Tue Apr 21** | Article 0 — Setup & Glossary | 3:00 PM | 4:00 PM | 2026-04-21 |
+| 2 | **Tue Apr 28** | Article 1 — Feature Pipeline | 3:00 PM | 4:00 PM | 2026-04-28 |
+| 3 | **Tue May 5** | Article 2 — Propensity Model | 3:00 PM | 4:00 PM | 2026-05-05 |
+| 4 | **Tue May 12** | Article 3 — RAG Retrieval | 3:00 PM | 4:00 PM | 2026-05-12 |
+| 5 | **Tue May 19** | Article 4 — LLM Generator | 3:00 PM | 4:00 PM | 2026-05-19 |
+| 6 | **Tue May 26** | Article 5 — LLMOps Pipeline | 3:00 PM | 4:00 PM | 2026-05-26 |
+| 7 | **Tue Jun 2** | Article 6 — RLHF Feedback Loop | 3:00 PM | 4:00 PM | 2026-06-02 |
+| 8 | **Tue Jun 9** | Article 7 — Recap & Next Steps | 3:00 PM | 4:00 PM | 2026-06-09 |
 
-**One-week gap between articles** gives the LinkedIn algorithm time to settle each post, avoids cannibilising your own reach, and gives readers time to engage and share before the next one lands.
+**Series runs: April 21 → June 9, 2026 (8 weeks)**
+
+One-week gap between articles gives the LinkedIn algorithm time to settle each post, avoids cannibilising your own reach, and gives readers time to engage and share before the next one lands.
 
 ---
 
@@ -73,7 +75,7 @@ Three rules from the latest research:
 ---
 
 ### Series Launch Post (Optional — 1 week before Article 0)
-*Publish: Tuesday, 4:00 PM CT*
+*Publish: Tue Apr 14 — 4:00 PM CT (optional teaser)*
 
 I'm publishing a seven-part series on building a production-grade offer intelligence platform from scratch.
 
@@ -96,7 +98,7 @@ Follow to get the full series as it releases.
 ---
 
 ### Post 0 — Setup & Glossary
-*Publish: Week 1, Tuesday 4:00 PM CT*
+*Publish: Tue Apr 21 — 4:00 PM CT*
 
 I've been working on production AI systems for six years. The number one friction point for every new team member — regardless of experience — isn't the code. It's the acronyms.
 
@@ -115,7 +117,7 @@ Article 0 of the LoyaltyLens series is live now.
 ---
 
 ### Post 1 — Feature Pipeline
-*Publish: Week 2, Tuesday 4:00 PM CT*
+*Publish: Tue Apr 28 — 4:00 PM CT*
 
 Most ML tutorials skip the feature pipeline entirely. They start with a clean CSV and a model.
 
@@ -135,7 +137,7 @@ Full walkthrough in Article 1 of the LoyaltyLens series.
 ---
 
 ### Post 2 — Propensity Model
-*Publish: Week 3, Tuesday 4:00 PM CT*
+*Publish: Tue May 5 — 4:00 PM CT*
 
 "Why didn't you just use XGBoost?"
 
@@ -159,7 +161,7 @@ Val AUC: 0.81 on synthetic data. Production equivalent: 0.85–0.88 with richer 
 ---
 
 ### Post 3 — RAG Retrieval
-*Publish: Week 4, Tuesday 4:00 PM CT*
+*Publish: Tue May 12 — 4:00 PM CT*
 
 I ran a benchmark nobody seems to publish cleanly: LangChain vs. LlamaIndex, pgvector vs. Weaviate, at 200 / 2,000 / 20,000 vectors.
 
@@ -182,7 +184,7 @@ Full benchmark and code in Article 3 of LoyaltyLens.
 ---
 
 ### Post 4 — LLM Generator
-*Publish: Week 5, Tuesday 4:00 PM CT*
+*Publish: Tue May 19 — 4:00 PM CT*
 
 Prompt engineering is software engineering.
 
@@ -203,7 +205,7 @@ Article 4 of LoyaltyLens covers:
 ---
 
 ### Post 5 — LLMOps Pipeline
-*Publish: Week 6, Tuesday 4:00 PM CT*
+*Publish: Tue May 26 — 4:00 PM CT*
 
 Here's a story about a PSI of 0.31 on a Monday morning.
 
@@ -227,7 +229,7 @@ Article 5 of LoyaltyLens covers the full LLMOps stack:
 ---
 
 ### Post 6 — RLHF Feedback Loop
-*Publish: Week 7, Tuesday 4:00 PM CT*
+*Publish: Tue Jun 2 — 4:00 PM CT*
 
 RLHF doesn't require a research team.
 
@@ -249,7 +251,7 @@ The most important design decision: export preference data in fine-tuning format
 ---
 
 ### Post 7 — Series Recap
-*Publish: Week 8, Tuesday 4:00 PM CT*
+*Publish: Tue Jun 9 — 4:00 PM CT*
 
 Eight weeks. Seven articles. Six modules. One complete production-pattern AI system built in the open.
 

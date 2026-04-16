@@ -2,7 +2,7 @@
 title: "LoyaltyLens: What We Built, What We Learned, and What to Build Next"
 slug: "loyaltylens-recap-next-steps"
 description: "A complete series recap — module-by-module decisions, five honest lessons from building a production AI system, and a prioritised roadmap for what to build next."
-date: 2025-10-20
+date: 2026-06-09
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 7
@@ -176,6 +176,6 @@ If there are topics in the series you'd like me to go deeper on — the SageMake
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect  specializing in AI, data, and platform architecture. He writes about production AI systems, ML engineering, and the gap between research and deployment.*
+*Pushparajan Ramar is an Enterprise Architect Director specializing in AI, data, and platform architecture. He writes about production AI systems, ML engineering, and the gap between research and deployment.*
 
 *[LinkedIn](https://linkedin.com/in/pushparajanramar) · [pushparajan.tech](https://pushparajan.tech)*

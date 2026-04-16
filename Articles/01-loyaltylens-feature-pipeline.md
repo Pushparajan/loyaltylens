@@ -2,7 +2,7 @@
 title: "How I Rebuilt a Loyalty Platform's Feature Pipeline in a Weekend (And What I Learned)"
 slug: "loyaltylens-feature-pipeline"
 description: "Building production-grade ML feature stores without a Databricks cluster — DuckDB, feature versioning, validation gates, and the two things that surprised me."
-date: 2025-09-08
+date: 2026-04-28
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 1

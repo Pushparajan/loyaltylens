@@ -2,7 +2,7 @@
 title: "The LLMOps Stack I Wish Existed When We Started in Production"
 slug: "loyaltylens-llmops-pipeline"
 description: "Prompt versioning CLI, LLM-as-judge eval harness, PSI drift monitoring, GitHub Actions CI/CD with a hard quality gate, and a responsible AI audit framework."
-date: 2025-10-06
+date: 2026-05-26
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 5

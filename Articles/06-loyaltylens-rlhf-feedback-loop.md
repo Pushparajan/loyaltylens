@@ -2,7 +2,7 @@
 title: "RLHF Without a Research Team: Building Practical Feedback Loops for Production LLMs"
 slug: "loyaltylens-rlhf-feedback-loop"
 description: "Closing the production AI loop — feedback capture UI, preference dataset export, automated retraining triggers, and the honest limits of practical RLHF."
-date: 2025-10-13
+date: 2026-06-02
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 6
