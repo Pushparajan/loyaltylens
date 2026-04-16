@@ -38,8 +38,8 @@ def generate_events(
 ) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
 
-    customer_uuids = [str(uuid.UUID(int=rng.integers(0, 2**128))) for _ in range(n_customers)]
-    offer_pool = [str(uuid.UUID(int=rng.integers(0, 2**128))) for _ in range(200)]
+    customer_uuids = [str(uuid.UUID(bytes=rng.integers(0, 256, size=16, dtype=np.uint8).tobytes())) for _ in range(n_customers)]
+    offer_pool = [str(uuid.UUID(bytes=rng.integers(0, 256, size=16, dtype=np.uint8).tobytes())) for _ in range(200)]
 
     customer_ids = rng.choice(customer_uuids, size=n_events)
     event_types = rng.choice(_EVENT_TYPES, size=n_events, p=_EVENT_WEIGHTS)

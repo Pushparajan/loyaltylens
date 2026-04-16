@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from sqlalchemy import text
@@ -34,7 +35,7 @@ class TransactionIngester:
         sql = text(
             """
             INSERT INTO transactions (transaction_id, customer_id, amount, currency, store_id, items, created_at)
-            VALUES (:transaction_id, :customer_id, :amount, :currency, :store_id, :items::jsonb, :created_at)
+            VALUES (:transaction_id, :customer_id, :amount, :currency, :store_id, CAST(:items AS jsonb), :created_at)
             ON CONFLICT (transaction_id) DO NOTHING
             """
         )
@@ -45,7 +46,7 @@ class TransactionIngester:
                 "amount": t.amount,
                 "currency": t.currency,
                 "store_id": t.store_id,
-                "items": str(t.items),
+                "items": json.dumps(t.items),
                 "created_at": t.created_at,
             }
             for t in batch

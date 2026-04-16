@@ -48,6 +48,7 @@ Read this once. Refer back to the glossary whenever something doesn't land.
 | Requirement | Minimum Version | Why |
 |---|---|---|
 | Python | 3.11+ | Match statements, tomllib, `dict \| dict` syntax |
+| uv | 0.4+ | Python package manager — replaces pip, Poetry, and pyenv in one tool |
 | Node.js | 18+ | Feedback loop React UI (Vite) |
 | Docker Desktop | 4.x | Postgres + pgvector + Weaviate services |
 | Git | 2.x | Prompt versioning uses git-tracked YAML |
@@ -56,27 +57,88 @@ Read this once. Refer back to the glossary whenever something doesn't land.
 
 ---
 
-### Step 1: Clone and Bootstrap
+### Step 1: Install uv and Bootstrap the Project
+
+`uv` is a Rust-based Python package manager from Astral that replaces `pip`, `pip-tools`, `pyenv`, `virtualenv`, and `poetry` in a single binary. It installs packages 10–100x faster than pip, manages Python versions itself, and works with the standard `pyproject.toml` format you already know.
+
+#### Install uv
 
 ```bash
-# Create project directory
+# macOS / Linux (recommended — installs a standalone binary, no Python required)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Alternatively, via pip if you already have Python
+pip install uv
+
+# Verify
+uv --version
+# → uv 0.4.x (or later)
+```
+
+After install, `uv` is available as a standalone command. It manages its own Python downloads — you do not need a separate `pyenv` or `python.org` installer.
+
+#### Pin your Python version
+
+```bash
+# Install Python 3.11 and pin it for this project
+uv python install 3.11
+uv python pin 3.11
+# → Creates .python-version file — commit this to git
+```
+
+#### Create project directory and virtual environment
+
+```bash
 mkdir loyaltylens && cd loyaltylens
 git init
 
-# Install Poetry (Python dependency manager)
-curl -sSL https://install.python-poetry.org | python3 -
+# Create a virtual environment using the pinned Python version
+uv venv
+# → Creates .venv/ in the project root
+# → Output: Using Python 3.11.x interpreter at ...
 
-# Verify
-poetry --version
-# → Poetry (version 1.8.x)
+# Activate the virtual environment
+source .venv/bin/activate        # macOS / Linux
+.venv\Scripts\activate           # Windows
 ```
 
 After running the Module bootstrap Claude Code prompt (covered in Article 1), your directory will have a `pyproject.toml`. Install everything in one command:
 
 ```bash
-poetry install
-poetry shell   # activates the virtual environment
+# Install all dependencies from pyproject.toml (first run: creates uv.lock)
+uv sync
+
+# Add a new package (equivalent to: pip install + update pyproject.toml)
+uv add langchain
+
+# Add a dev-only dependency
+uv add --dev pytest ruff mypy
+
+# Remove a package
+uv remove somepackage
 ```
+
+`uv sync` reads `pyproject.toml`, creates a lockfile (`uv.lock`) on first run, and installs everything into `.venv` in one pass. Subsequent runs are near-instant if the lockfile hasn't changed.
+
+#### Key uv commands at a glance
+
+```bash
+uv sync                  # Install all deps from pyproject.toml + uv.lock
+uv add <pkg>             # Add and install a package
+uv remove <pkg>          # Remove a package
+uv run python script.py  # Run a script in the project's venv (no activate needed)
+uv run pytest            # Run any tool through the venv
+uv lock --upgrade        # Regenerate lockfile with latest compatible versions
+uv python list           # Show all available Python versions
+uv python install 3.12   # Download and install a specific Python version
+```
+
+#### Why uv instead of Poetry?
+
+Three practical reasons: `uv sync` is 10–100x faster than `poetry install` on a cold cache, `uv` manages Python versions itself (no separate `pyenv`), and it produces a standard `uv.lock` that is fully reproducible across machines and CI environments without extra configuration. The `pyproject.toml` format is identical — if you have an existing Poetry project, `uv` reads it without changes.
 
 ---
 
@@ -100,7 +162,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   weaviate:
-    image: semitechnologies/weaviate:1.24.1
+    image: semitechnologies/weaviate:1.25.4
     ports:
       - "8080:8080"
     environment:
@@ -117,22 +179,34 @@ volumes:
   pgdata:
 ```
 
-```bash
-docker-compose up -d
+**Before running `docker compose`, Docker Desktop must be running.** Open it from the Start menu (Windows) or Applications (macOS) and wait until the system-tray icon says "Docker Desktop is running" — this takes 30–60 seconds on first launch. Verify with `docker info` before continuing.
 
-# Verify all three are running
-docker-compose ps
-# NAME         STATUS    PORTS
-# postgres     running   0.0.0.0:5432->5432/tcp
-# weaviate     running   0.0.0.0:8080->8080/tcp
-# redis        running   0.0.0.0:6379->6379/tcp
+```bash
+docker compose up -d
+
+# Verify all three are healthy before proceeding
+docker compose ps
+# NAME                     STATUS
+# loyaltylens_postgres     running (healthy)
+# loyaltylens_weaviate     running (healthy)
+# loyaltylens_redis        running (healthy)
 ```
 
 Enable the pgvector extension (one-time setup):
 
 ```bash
-docker exec -it loyaltylens-postgres-1 psql -U loyaltylens -c "CREATE EXTENSION IF NOT EXISTS vector;"
+docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens -c "CREATE EXTENSION IF NOT EXISTS vector;"
 # → CREATE EXTENSION
+```
+
+Apply the database schema (one-time setup):
+
+```bash
+# macOS / Linux
+docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens < db/schema.sql
+
+# Windows (PowerShell — the < operator is not supported)
+Get-Content db/schema.sql | docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens
 ```
 
 ---
@@ -169,10 +243,12 @@ GITHUB_REPO=yourusername/loyaltylens
 MLflow tracks experiments for the propensity model (Module 2). It runs as a local server:
 
 ```bash
-pip install mlflow --break-system-packages  # or: poetry add mlflow
+# If you ran uv sync it's already installed via pyproject.toml.
+# To add it manually:
+uv add mlflow
 
 # Start the tracking server
-mlflow ui --port 5000 &
+uv run mlflow ui --port 5000 &
 # → Open http://localhost:5000 to see the experiment dashboard
 ```
 
@@ -183,7 +259,7 @@ mlflow ui --port 5000 &
 Run this quick sanity check after setup:
 
 ```bash
-python -c "
+uv run python -c "
 import duckdb, torch, langchain, llama_index, weaviate, pgvector
 print('DuckDB:', duckdb.__version__)
 print('PyTorch:', torch.__version__)
@@ -193,7 +269,28 @@ print('All imports OK')
 "
 ```
 
+`uv run` automatically uses the project's virtual environment — it works whether or not you've run `source .venv/bin/activate`. Useful for one-off commands in CI pipelines or scripts.
+
 If everything passes, your environment is ready. If `torch.cuda.is_available()` returns `False`, that's fine — LoyaltyLens runs on CPU. Training Module 2 takes ~3 minutes on CPU vs. ~20 seconds on GPU.
+
+Run the pipeline smoke test to confirm the full ETL flow works end-to-end:
+
+```bash
+python run_pipeline.py
+# Pipeline result: {'transactions': 2, 'customers': 2}
+```
+
+Verify the rows landed in Postgres:
+
+```bash
+# macOS / Linux (if psql is on PATH)
+psql postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens \
+  -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
+
+# Windows (PowerShell) or if psql is not on PATH
+docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens \
+  -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
+```
 
 ---
 
@@ -487,6 +584,11 @@ The neural network architecture that underpins virtually all modern LLMs. Introd
 **Vector Database**
 A database optimized for storing and querying high-dimensional vectors (embeddings). Uses approximate nearest neighbor algorithms (IVFFlat, HNSW) to find similar vectors faster than an exact linear scan. In LoyaltyLens (M3): pgvector (Postgres extension) and Weaviate (standalone service) are both implemented and benchmarked.
 
+**uv**
+A Rust-based Python package manager from Astral that replaces pip, pip-tools, pyenv, virtualenv, and poetry in a single binary. Key properties: installs packages 10–100x faster than pip, manages Python versions itself (no separate pyenv needed), produces a reproducible `uv.lock` lockfile, and works with standard `pyproject.toml`. In LoyaltyLens: used as the sole package manager — `uv sync` installs all dependencies, `uv add` adds new ones, `uv run` executes commands inside the virtual environment without needing to activate it first.
+
+---
+
 **Vertex AI**
 Google Cloud's fully managed ML platform. Analogous to AWS SageMaker. Includes: training pipelines, model registry, online prediction endpoints, and the Text-Embeddings API for generating embeddings without a custom model. Google Cloud Vertex AI certified (LLMs and Text-Embeddings API). Mentioned as a deployment stretch goal in LoyaltyLens M3.
 
@@ -523,6 +625,7 @@ An open-source vector database with a GraphQL/REST API, native support for multi
 | React + Vite | M6 | Feedback collection UI |
 | SQLite | M6 | Feedback persistence |
 | Preference dataset (JSONL) | M6 | RLHF training data export |
+| uv | All | Python package manager (replaces pip + Poetry + pyenv) |
 | FastAPI | All | HTTP API serving |
 | structlog | All | Structured logging |
 | Pydantic | All | Data validation |
