@@ -95,45 +95,59 @@ uv python pin 3.11
 mkdir loyaltylens && cd loyaltylens
 git init
 
-# Create a virtual environment using the pinned Python version
-uv venv
+# Always specify --python explicitly — uv will otherwise pick whatever
+# CPython version it finds first, which may be 3.12+ and not 3.11
+uv venv .venv --python 3.11
 # → Creates .venv/ in the project root
 # → Output: Using Python 3.11.x interpreter at ...
 
 # Activate the virtual environment
 source .venv/bin/activate        # macOS / Linux
-.venv\Scripts\activate           # Windows
+.venv\Scripts\activate           # Windows (PowerShell)
 ```
 
 After running the Module bootstrap Claude Code prompt (covered in Article 1), your directory will have a `pyproject.toml`. Install everything in one command:
 
 ```bash
-# Install all dependencies from pyproject.toml (first run: creates uv.lock)
-uv sync
+# Install all project dependencies into the active venv
+# (run from the repo root, not from a sub-module directory)
+uv pip install -e .
 
-# Add a new package (equivalent to: pip install + update pyproject.toml)
+# Add a new package
 uv add langchain
-
-# Add a dev-only dependency
-uv add --dev pytest ruff mypy
 
 # Remove a package
 uv remove somepackage
 ```
 
-`uv sync` reads `pyproject.toml`, creates a lockfile (`uv.lock`) on first run, and installs everything into `.venv` in one pass. Subsequent runs are near-instant if the lockfile hasn't changed.
+> **Note on `uv sync` vs `uv pip install -e .`:** `uv sync` works best when `pyproject.toml` uses the standard `[project]` table. LoyaltyLens uses the Poetry-format `[tool.poetry]` table, which `uv` reads for dependency resolution but does not support `uv sync` or `[tool.poetry.group.dev]` extras. Use `uv pip install -e .` to install base dependencies, then install dev tools separately (see below).
+
+#### Install dev tools
+
+`pytest`, `ruff`, and `mypy` are listed under `[tool.poetry.group.dev.dependencies]`, which `uv pip install -e .` does not install. Add them explicitly:
+
+```bash
+uv pip install pytest pytest-asyncio pytest-cov ruff mypy
+```
+
+#### Running tests
+
+Use `python -m pytest` (or `uv run pytest` only if the root `.venv` is the active environment). Running bare `pytest` will fail if it is not on PATH, and `uv run pytest` can create a conflicting venv if a different `VIRTUAL_ENV` is already set:
+
+```bash
+python -m pytest tests/
+```
 
 #### Key uv commands at a glance
 
 ```bash
-uv sync                  # Install all deps from pyproject.toml + uv.lock
-uv add <pkg>             # Add and install a package
+uv pip install -e .      # Install project + dependencies into active venv
+uv pip install <pkg>     # Install a package into active venv
+uv add <pkg>             # Add package to pyproject.toml and install
 uv remove <pkg>          # Remove a package
-uv run python script.py  # Run a script in the project's venv (no activate needed)
-uv run pytest            # Run any tool through the venv
-uv lock --upgrade        # Regenerate lockfile with latest compatible versions
+uv run python script.py  # Run a script through the project venv (no activate needed)
 uv python list           # Show all available Python versions
-uv python install 3.12   # Download and install a specific Python version
+uv python install 3.11   # Download and install a specific Python version
 ```
 
 #### Why uv instead of Poetry?
@@ -243,7 +257,7 @@ GITHUB_REPO=yourusername/loyaltylens
 MLflow tracks experiments for the propensity model (Module 2). It runs as a local server:
 
 ```bash
-# If you ran uv sync it's already installed via pyproject.toml.
+# Already installed if you ran: uv pip install -e .
 # To add it manually:
 uv add mlflow
 

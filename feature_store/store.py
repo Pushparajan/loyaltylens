@@ -69,6 +69,7 @@ class FeatureStore:
         self._validate(df)
         insert_df = df[["customer_id"] + _FEATURE_COLS].copy()
         insert_df["version"] = version
+        insert_df = insert_df[["customer_id", "version"] + _FEATURE_COLS]
         self._conn.execute("DELETE FROM features WHERE version = ?", [version])
         self._conn.execute("INSERT INTO features SELECT *, now() FROM insert_df")
         logger.info("features_written", version=version, rows=len(df))

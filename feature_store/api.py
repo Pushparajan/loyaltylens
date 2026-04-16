@@ -69,25 +69,6 @@ class StatsResponse(BaseModel):
 
 
 @app.get(
-    "/features/{customer_id}",
-    response_model=FeatureVector,
-    summary="Get feature vector for a customer",
-    description=(
-        "Return the most recently written feature row for the given ``customer_id``. "
-        "Raises **404** if the customer is not found in any feature version."
-    ),
-)
-def get_customer_features(customer_id: str) -> FeatureVector:
-    store = _get_store()
-    row = store.read_latest(customer_id)
-    if row is None:
-        logger.info("customer_not_found", customer_id=customer_id)
-        raise HTTPException(status_code=404, detail=f"No features found for customer '{customer_id}'")
-    logger.info("features_served", customer_id=customer_id, version=row.get("version"))
-    return FeatureVector(**row)
-
-
-@app.get(
     "/features/stats",
     response_model=StatsResponse,
     summary="Summary statistics for the latest feature version",
@@ -105,3 +86,22 @@ def get_feature_stats() -> StatsResponse:
     stats_df = store.get_feature_stats(latest)
     logger.info("stats_served", version=latest, columns=len(stats_df))
     return StatsResponse(version=latest, stats=stats_df.to_dict(orient="records"))
+
+
+@app.get(
+    "/features/{customer_id}",
+    response_model=FeatureVector,
+    summary="Get feature vector for a customer",
+    description=(
+        "Return the most recently written feature row for the given ``customer_id``. "
+        "Raises **404** if the customer is not found in any feature version."
+    ),
+)
+def get_customer_features(customer_id: str) -> FeatureVector:
+    store = _get_store()
+    row = store.read_latest(customer_id)
+    if row is None:
+        logger.info("customer_not_found", customer_id=customer_id)
+        raise HTTPException(status_code=404, detail=f"No features found for customer '{customer_id}'")
+    logger.info("features_served", customer_id=customer_id, version=row.get("version"))
+    return FeatureVector(**row)

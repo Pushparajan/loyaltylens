@@ -88,7 +88,11 @@ EVENT_WEIGHTS = {
 }
 
 def generate_events(n: int = 50_000) -> pd.DataFrame:
-    customers = [str(uuid4()) for _ in range(5_000)]
+    # Generate UUIDs from random bytes — rng.integers(0, 2**128) overflows int64
+    customers = [
+        str(uuid.UUID(bytes=rng.integers(0, 256, size=16, dtype=np.uint8).tobytes()))
+        for _ in range(5_000)
+    ]
     events = []
     for _ in range(n):
         event_type = rng.choice(
@@ -107,7 +111,7 @@ def generate_events(n: int = 50_000) -> pd.DataFrame:
     return pd.DataFrame(events)
 ```
 
-One detail worth noting: I used `numpy.random.default_rng(seed=42)` rather than the older `np.random.seed()` API. The new Generator API is faster, more reproducible across NumPy versions, and doesn't share global state — important when you're running parallel feature jobs.
+Two implementation details worth noting. First, I used `numpy.random.default_rng(seed=42)` rather than the older `np.random.seed()` API — the new Generator is faster, more reproducible across NumPy versions, and doesn't share global state. Second, UUID generation uses `rng.integers(0, 256, size=16).tobytes()` rather than `rng.integers(0, 2**128)`: NumPy's integer generator is capped at `int64`, so passing `2**128` as the upper bound raises a `ValueError` at runtime.
 
 ---
 
@@ -157,20 +161,16 @@ import duckdb
 
 conn = duckdb.connect("data/feature_store.duckdb")
 
-# Write versioned feature table
-def write_version(df: pd.DataFrame, version: int) -> None:
-    conn.execute(f"""
-        CREATE TABLE IF NOT EXISTS features_v{version} AS
-        SELECT * FROM df
-    """)
-    conn.execute(f"""
-        INSERT INTO feature_registry VALUES (
-            {version},
-            current_timestamp,
-            {len(df)},
-            '{df.columns.tolist()}'
-        )
-    """)
+# Write versioned feature table.
+# Column order in the DataFrame MUST match the table schema before inserting —
+# DuckDB's INSERT INTO … SELECT * maps by position, not by name.
+# Mismatched order causes string columns to land in DOUBLE slots at runtime.
+def write_version(df: pd.DataFrame, version: str) -> None:
+    insert_df = df[["customer_id"] + FEATURE_COLS].copy()
+    insert_df["version"] = version
+    insert_df = insert_df[["customer_id", "version"] + FEATURE_COLS]
+    conn.execute("DELETE FROM features WHERE version = ?", [version])
+    conn.execute("INSERT INTO features SELECT *, now() FROM insert_df")
 ```
 
 The versioning design gives me something critical: I can reproduce **exactly** which feature values fed any historical model prediction. This is a requirement for explainability in responsible AI governance — something I enforce rigorously in production given the scale of the loyalty program.
@@ -226,6 +226,16 @@ from feature_store.store import FeatureStore
 app = FastAPI(title="LoyaltyLens Feature API")
 store = FeatureStore()
 
+# IMPORTANT: /features/stats must be registered BEFORE /features/{customer_id}.
+# FastAPI matches routes in registration order — if the path-parameter route comes
+# first, requests to /features/stats are captured with customer_id="stats" and
+# return a 404 instead of hitting the stats handler.
+
+@app.get("/features/stats")
+async def get_stats() -> dict:
+    """Feature distribution statistics for monitoring."""
+    return store.get_feature_stats(version="latest")
+
 @app.get("/features/{customer_id}")
 async def get_features(customer_id: str) -> dict:
     """Serve the latest versioned feature vector for a customer."""
@@ -233,11 +243,6 @@ async def get_features(customer_id: str) -> dict:
         return store.read_latest(customer_id)
     except KeyError:
         raise HTTPException(status_code=404, detail="Customer not found")
-
-@app.get("/features/stats")
-async def get_stats() -> dict:
-    """Feature distribution statistics for monitoring."""
-    return store.get_feature_stats(version="latest")
 ```
 
 The `/features/stats` endpoint feeds the drift monitor in Module 5 — it's not a nice-to-have, it's how the system closes the loop on feature quality.
