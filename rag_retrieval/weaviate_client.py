@@ -17,12 +17,13 @@ class WeaviateClient:
 
     def __init__(self) -> None:
         settings = get_settings()
+        host = settings.weaviate_url.split("://")[-1].split(":")[0]
         self._client = weaviate.connect_to_custom(
-            http_host=settings.weaviate_url.split("://")[-1].split(":")[0],
-            http_port=int(settings.weaviate_url.split(":")[-1]) if ":" in settings.weaviate_url.split("://")[-1] else 8080,
+            http_host=host,
+            http_port=settings.weaviate_http_port,
             http_secure=settings.weaviate_url.startswith("https"),
-            grpc_host=settings.weaviate_url.split("://")[-1].split(":")[0],
-            grpc_port=50051,
+            grpc_host=host,
+            grpc_port=settings.weaviate_grpc_port,
             grpc_secure=False,
         )
         logger.info("weaviate_connected", url=settings.weaviate_url)

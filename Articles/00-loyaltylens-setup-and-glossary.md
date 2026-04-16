@@ -19,7 +19,7 @@ tags:
 
 # Before You Write a Single Line: The Complete Setup Guide and Glossary for LoyaltyLens
 
-*Everything you need to understand the project, the stack, and the jargon — before Module 1*
+Everything you need to understand the project, the stack, and the jargon — before Module 1
 
 ---
 
@@ -46,13 +46,13 @@ Read this once. Refer back to the glossary whenever something doesn't land.
 ### What You Need Before You Start
 
 | Requirement | Minimum Version | Why |
-|---|---|---|
+| --- | --- | --- |
 | Python | 3.11+ | Match statements, tomllib, `dict \| dict` syntax |
 | uv | 0.4+ | Python package manager — replaces pip, Poetry, and pyenv in one tool |
 | Node.js | 18+ | Feedback loop React UI (Vite) |
 | Docker Desktop | 4.x | Postgres + pgvector + Weaviate services |
 | Git | 2.x | Prompt versioning uses git-tracked YAML |
-| 8GB RAM | — | Running a local HuggingFace model + Weaviate concurrently |
+| 8 GB RAM | — | Running a local HuggingFace model + Weaviate concurrently |
 | Claude Code | latest | Primary agentic coding tool for the project |
 
 ---
@@ -100,18 +100,29 @@ git init
 uv venv .venv --python 3.11
 # → Creates .venv/ in the project root
 # → Output: Using Python 3.11.x interpreter at ...
-
-# Activate the virtual environment
-source .venv/bin/activate        # macOS / Linux
-.venv\Scripts\activate           # Windows (PowerShell)
 ```
+
+Activate the virtual environment:
+
+```bash
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows (PowerShell) — use Activate.ps1, not activate.bat
+.venv\Scripts\Activate.ps1
+```
+
+> **Windows execution policy:** If PowerShell blocks the activation script, run this once:
+>
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
 
 After running the Module bootstrap Claude Code prompt (covered in Article 1), your directory will have a `pyproject.toml`. Install everything in one command:
 
 ```bash
-# Install all project dependencies into the active venv
-# (run from the repo root, not from a sub-module directory)
-uv pip install -e .
+# Install all project dependencies (production + dev) into the active venv
+uv sync --dev
 
 # Add a new package
 uv add langchain
@@ -120,11 +131,16 @@ uv add langchain
 uv remove somepackage
 ```
 
-> **Note on `uv sync` vs `uv pip install -e .`:** `uv sync` works best when `pyproject.toml` uses the standard `[project]` table. LoyaltyLens uses the Poetry-format `[tool.poetry]` table, which `uv` reads for dependency resolution but does not support `uv sync` or `[tool.poetry.group.dev]` extras. Use `uv pip install -e .` to install base dependencies, then install dev tools separately (see below).
+> **One venv to rule them all.** The repo root `.venv/` is the single canonical virtual environment. Sub-module folders (`data_pipeline/`, `propensity_model/`) may have their own `.venv/` from earlier experimentation — ignore them. Always install into and run from the root `.venv`. When installing packages explicitly, target it directly:
+>
+> ```powershell
+> # Windows — always target the root .venv
+> uv pip install --python .venv\Scripts\python.exe <package>
+> ```
 
 #### Install dev tools
 
-`pytest`, `ruff`, and `mypy` are listed under `[tool.poetry.group.dev.dependencies]`, which `uv pip install -e .` does not install. Add them explicitly:
+`pytest`, `ruff`, and `mypy` are listed under `[tool.poetry.group.dev.dependencies]`. `uv sync --dev` installs them automatically. If you need to add them manually:
 
 ```bash
 uv pip install pytest pytest-asyncio pytest-cov ruff mypy
@@ -132,16 +148,27 @@ uv pip install pytest pytest-asyncio pytest-cov ruff mypy
 
 #### Running tests
 
-Use `python -m pytest` (or `uv run pytest` only if the root `.venv` is the active environment). Running bare `pytest` will fail if it is not on PATH, and `uv run pytest` can create a conflicting venv if a different `VIRTUAL_ENV` is already set:
+Use `python -m pytest` rather than bare `pytest` — it always resolves to the active venv's interpreter:
 
 ```bash
 python -m pytest tests/
 ```
 
+#### Running FastAPI services
+
+Use `python -m uvicorn` rather than bare `uvicorn` — on Windows, venv scripts are not on `PATH` unless the venv is activated:
+
+```bash
+# Reliable on all platforms
+python -m uvicorn rag_retrieval.api:app --host 127.0.0.1 --port 8010 --reload --reload-dir rag_retrieval
+```
+
+> **Windows port note:** Binding to `0.0.0.0` triggers a Windows firewall permission error (`WinError 10013`). Use `127.0.0.1` for local development. To expose the service on the LAN, run PowerShell as Administrator and allow the port through the firewall first.
+
 #### Key uv commands at a glance
 
 ```bash
-uv pip install -e .      # Install project + dependencies into active venv
+uv sync --dev            # Install all deps (production + dev) from lockfile
 uv pip install <pkg>     # Install a package into active venv
 uv add <pkg>             # Add package to pyproject.toml and install
 uv remove <pkg>          # Remove a package
@@ -158,10 +185,10 @@ Three practical reasons: `uv sync` is 10–100x faster than `poetry install` on 
 
 ### Step 2: Start Infrastructure Services
 
-LoyaltyLens uses three infrastructure services, all managed via Docker Compose:
+LoyaltyLens uses three infrastructure services managed via Docker Compose. **Docker Desktop must be running** before executing any `docker compose` command — open it from the Start menu (Windows) or Applications (macOS) and wait until the system tray icon says "Docker Desktop is running" (30–60 seconds on first launch). Verify with `docker info`.
 
 ```yaml
-# docker-compose.yml (generated by Claude Code bootstrap)
+# docker-compose.yml (at repo root)
 services:
 
   postgres:
@@ -173,82 +200,154 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   weaviate:
-    image: semitechnologies/weaviate:1.25.4
+    image: semitechnologies/weaviate:1.28.2   # ≥ 1.27.0 required for the v4 Python client
     ports:
       - "8080:8080"
+      - "50051:50051"                          # gRPC port — required by weaviate-client v4
     environment:
-      QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
       DEFAULT_VECTORIZER_MODULE: none
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.2-alpine
     ports:
       - "6379:6379"
 
 volumes:
-  pgdata:
+  postgres_data:
+  weaviate_data:
+  redis_data:
 ```
 
-**Before running `docker compose`, Docker Desktop must be running.** Open it from the Start menu (Windows) or Applications (macOS) and wait until the system-tray icon says "Docker Desktop is running" — this takes 30–60 seconds on first launch. Verify with `docker info` before continuing.
+> **Weaviate version matters.** The `weaviate-client` Python library v4 requires Weaviate server **≥ 1.27.0** and also needs the gRPC port `50051` exposed. Using `1.25.x` produces a `WeaviateStartUpError` at connection time. The repo ships `1.28.2`.
 
-```bash
-docker compose up -d
+Start all services:
 
-# Verify all three are healthy before proceeding
+```powershell
+docker compose up -d postgres weaviate redis
+
+# Confirm all three show (healthy)
 docker compose ps
-# NAME                     STATUS
-# loyaltylens_postgres     running (healthy)
-# loyaltylens_weaviate     running (healthy)
-# loyaltylens_redis        running (healthy)
 ```
 
-Enable the pgvector extension (one-time setup):
+#### Automatic pgvector setup
 
-```bash
-docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens -c "CREATE EXTENSION IF NOT EXISTS vector;"
-# → CREATE EXTENSION
-```
+The repo ships `docker/init-pgvector.sql`, which Docker runs automatically on first container start via `docker-entrypoint-initdb.d`. It enables the `vector` extension — **no manual `CREATE EXTENSION` step is needed**.
 
-Apply the database schema (one-time setup):
+#### Apply the database schema
 
-```bash
+```powershell
+# Windows (PowerShell — the < operator is not supported natively)
+Get-Content db/schema.sql | docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens
+
 # macOS / Linux
 docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens < db/schema.sql
-
-# Windows (PowerShell — the < operator is not supported)
-Get-Content db/schema.sql | docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens
 ```
+
+#### Restarting Docker from scratch
+
+When you need a completely clean state — empty databases, fresh volumes:
+
+```powershell
+# Stop containers and delete all data volumes
+docker compose down -v
+
+# Start fresh
+docker compose up -d postgres weaviate redis
+
+# Re-run the data and embedding pipelines
+python rag_retrieval/generate_offers.py
+python rag_retrieval/embeddings.py
+```
+
+> Omit `-v` if you just want to restart containers without losing stored data.
 
 ---
 
 ### Step 3: Environment Variables
 
-Copy the template and fill in your keys:
+**Single source of truth:** one `.env` file at the **repo root**. No module-level `.env` files — all modules import `shared.config.get_settings()`, which reads the root `.env`.
 
-```bash
+```powershell
+# Windows
+Copy-Item .env.example .env
+
+# macOS / Linux
 cp .env.example .env
 ```
 
-```bash
-# .env — fill these in
+Fill in your keys. The full `.env.example` template:
+
+```dotenv
+# ── External APIs ──────────────────────────────────────────────────────────
 OPENAI_API_KEY=sk-...          # Required for LLM generation (M4) and LLM judge (M5)
 HF_TOKEN=hf_...                # Optional — needed for gated HuggingFace models
+SAGEMAKER_ENDPOINT=            # Leave blank unless deploying to AWS
 
+# ── Infrastructure: connection URLs ────────────────────────────────────────
 POSTGRES_URL=postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens
 WEAVIATE_URL=http://localhost:8080
 REDIS_URL=redis://localhost:6379
 
-# Optional stretch goals
-SAGEMAKER_ENDPOINT=            # Leave blank unless deploying to AWS
-GITHUB_TOKEN=                  # Leave blank unless using the retraining trigger
-GITHUB_REPO=yourusername/loyaltylens
+# ── Infrastructure: individual ports ───────────────────────────────────────
+# All modules read these from shared.config.Settings — change once, applies everywhere.
+POSTGRES_PORT=5432
+WEAVIATE_HTTP_PORT=8080
+WEAVIATE_GRPC_PORT=50051
+REDIS_PORT=6379
+MLFLOW_PORT=5000
+
+# ── Service API ports ───────────────────────────────────────────────────────
+PORT_FEATURE_STORE=8001
+PORT_PROPENSITY=8002
+PORT_RAG_RETRIEVAL=8003
+PORT_LLM_GENERATOR=8004
+PORT_FEEDBACK_LOOP=8005
+PORT_METRICS=8006
+
+# ── MLflow ──────────────────────────────────────────────────────────────────
+MLFLOW_TRACKING_URI=http://localhost:5000
+MLFLOW_EXPERIMENT_NAME=loyaltylens
+
+# ── Local data paths ────────────────────────────────────────────────────────
+RAW_EVENTS_PATH=data/raw/events.parquet
+PROCESSED_FEATURES_PATH=data/processed/features.parquet
+DUCKDB_PATH=data/feature_store.duckdb
+
+# ── Propensity model ────────────────────────────────────────────────────────
+PROPENSITY_MODEL_VERSION=1
+PROPENSITY_MODELS_DIR=models
+
+# ── Pipeline tunables ───────────────────────────────────────────────────────
+BATCH_SIZE=512
+EVAL_PASS_THRESHOLD=0.75
 ```
 
-**A note on API costs:** The project is designed to run with `gpt-4o-mini` as the LLM backend. Running the full eval harness (50 generations + 50 LLM judge calls) costs approximately **$0.03 per run**. The entire project from bootstrap to a working dashboard costs less than $1 in API calls if you're careful. If you want zero API cost, the HuggingFace backend with Mistral-7B-Instruct runs locally — you'll need the 8GB RAM headroom.
+#### Load `.env` in a PowerShell session
+
+PowerShell does not auto-load `.env` files. Run this to export all keys into the current session:
+
+```powershell
+Get-Content .env | ForEach-Object {
+    if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
+        [System.Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim(), 'Process')
+    }
+}
+```
+
+#### Creating a HuggingFace token
+
+1. Go to [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) and sign in (or create a free account).
+2. Click **New token**, set **Role** to **Read**, and click **Generate a token**.
+3. Copy the token — it starts with `hf_` and is shown only once.
+4. Paste it as `HF_TOKEN=hf_...` in your `.env` file.
+
+The token is optional for `all-MiniLM-L6-v2` (public model). It is required for gated models such as Llama or Mistral.
+
+**A note on API costs:** The project is designed to run with `gpt-4o-mini` as the LLM backend. Running the full eval harness (50 generations + 50 LLM judge calls) costs approximately **$0.03 per run**. The entire project from bootstrap to a working dashboard costs less than $1 in API calls. If you want zero API cost, the HuggingFace backend with Mistral-7B-Instruct runs locally — you'll need the 8 GB RAM headroom.
 
 ---
 
@@ -257,12 +356,9 @@ GITHUB_REPO=yourusername/loyaltylens
 MLflow tracks experiments for the propensity model (Module 2). It runs as a local server:
 
 ```bash
-# Already installed if you ran: uv pip install -e .
-# To add it manually:
-uv add mlflow
-
+# Already installed via: uv sync --dev
 # Start the tracking server
-uv run mlflow ui --port 5000 &
+python -m mlflow ui --port 5000
 # → Open http://localhost:5000 to see the experiment dashboard
 ```
 
@@ -270,11 +366,11 @@ uv run mlflow ui --port 5000 &
 
 ### Step 5: Verify the Full Stack
 
-Run this quick sanity check after setup:
+Run this sanity check after completing steps 1–4:
 
-```bash
-uv run python -c "
-import duckdb, torch, langchain, llama_index, weaviate, pgvector
+```python
+python -c "
+import duckdb, torch, langchain, weaviate
 print('DuckDB:', duckdb.__version__)
 print('PyTorch:', torch.__version__)
 print('CUDA available:', torch.cuda.is_available())
@@ -282,8 +378,6 @@ print('LangChain:', langchain.__version__)
 print('All imports OK')
 "
 ```
-
-`uv run` automatically uses the project's virtual environment — it works whether or not you've run `source .venv/bin/activate`. Useful for one-off commands in CI pipelines or scripts.
 
 If everything passes, your environment is ready. If `torch.cuda.is_available()` returns `False`, that's fine — LoyaltyLens runs on CPU. Training Module 2 takes ~3 minutes on CPU vs. ~20 seconds on GPU.
 
@@ -296,13 +390,13 @@ python run_pipeline.py
 
 Verify the rows landed in Postgres:
 
-```bash
-# macOS / Linux (if psql is on PATH)
-psql postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens \
+```powershell
+# Windows PowerShell (no psql required — uses the container)
+docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens `
   -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
 
-# Windows (PowerShell) or if psql is not on PATH
-docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens \
+# macOS / Linux (if psql is on PATH)
+psql postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens \
   -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
 ```
 
@@ -326,6 +420,26 @@ The prompts in each article are written for Claude Code specifically — they as
 
 ---
 
+### Service Port Reference
+
+All ports are centralised in `shared/config.py` and read from the root `.env`. Change a port once — it propagates everywhere.
+
+| Service | Default Port | Env Var | Command |
+| --- | --- | --- | --- |
+| PostgreSQL / pgvector | 5432 | `POSTGRES_PORT` | Docker Compose |
+| Weaviate HTTP | 8080 | `WEAVIATE_HTTP_PORT` | Docker Compose |
+| Weaviate gRPC | 50051 | `WEAVIATE_GRPC_PORT` | Docker Compose |
+| Redis | 6379 | `REDIS_PORT` | Docker Compose |
+| MLflow UI | 5000 | `MLFLOW_PORT` | `python -m mlflow ui` |
+| Feature Store API | 8001 | `PORT_FEATURE_STORE` | `python -m uvicorn feature_store.api:app --port 8001` |
+| Propensity API | 8002 | `PORT_PROPENSITY` | `python -m uvicorn propensity_model.api:app --port 8002` |
+| RAG Retrieval API | 8003 | `PORT_RAG_RETRIEVAL` | `python -m uvicorn rag_retrieval.api:app --port 8003` |
+| LLM Generator API | 8004 | `PORT_LLM_GENERATOR` | `python -m uvicorn llm_generator.api:app --port 8004` |
+| Feedback Loop API | 8005 | `PORT_FEEDBACK_LOOP` | `python -m uvicorn feedback_loop.api:app --port 8005` |
+| Prometheus Metrics | 8006 | `PORT_METRICS` | Started by `MetricsCollector.start_server()` |
+
+---
+
 ## Part 2: The Mental Model
 
 Before the glossary, it helps to understand how all the pieces relate. Here's the one-paragraph version:
@@ -336,7 +450,7 @@ Everything in the system exists to serve that sentence. Every module is one clau
 
 ### The Data Flow at a Glance
 
-```
+```text
 Raw Events (Parquet)
   │
   ▼
@@ -599,26 +713,26 @@ The neural network architecture that underpins virtually all modern LLMs. Introd
 A database optimized for storing and querying high-dimensional vectors (embeddings). Uses approximate nearest neighbor algorithms (IVFFlat, HNSW) to find similar vectors faster than an exact linear scan. In LoyaltyLens (M3): pgvector (Postgres extension) and Weaviate (standalone service) are both implemented and benchmarked.
 
 **uv**
-A Rust-based Python package manager from Astral that replaces pip, pip-tools, pyenv, virtualenv, and poetry in a single binary. Key properties: installs packages 10–100x faster than pip, manages Python versions itself (no separate pyenv needed), produces a reproducible `uv.lock` lockfile, and works with standard `pyproject.toml`. In LoyaltyLens: used as the sole package manager — `uv sync` installs all dependencies, `uv add` adds new ones, `uv run` executes commands inside the virtual environment without needing to activate it first.
+A Rust-based Python package manager from Astral that replaces pip, pip-tools, pyenv, virtualenv, and poetry in a single binary. Key properties: installs packages 10–100x faster than pip, manages Python versions itself (no separate pyenv needed), produces a reproducible `uv.lock` lockfile, and works with standard `pyproject.toml`. In LoyaltyLens: used as the sole package manager — `uv sync --dev` installs all dependencies, `uv add` adds new ones.
 
 ---
 
 **Vertex AI**
-Google Cloud's fully managed ML platform. Analogous to AWS SageMaker. Includes: training pipelines, model registry, online prediction endpoints, and the Text-Embeddings API for generating embeddings without a custom model. Google Cloud Vertex AI certified (LLMs and Text-Embeddings API). Mentioned as a deployment stretch goal in LoyaltyLens M3.
+Google Cloud's fully managed ML platform. Analogous to AWS SageMaker. Includes: training pipelines, model registry, online prediction endpoints, and the Text-Embeddings API for generating embeddings without a custom model. Mentioned as a deployment stretch goal in LoyaltyLens M3.
 
 ---
 
 ### W
 
 **Weaviate**
-An open-source vector database with a GraphQL/REST API, native support for multi-tenancy, and built-in vectorizer modules. Can be self-hosted or used as a managed service. In LoyaltyLens (M3): used as the secondary vector store alongside pgvector, benchmarked on latency and compared on operational complexity.
+An open-source vector database with a GraphQL/REST API, native support for multi-tenancy, and built-in vectorizer modules. Can be self-hosted or used as a managed service. In LoyaltyLens (M3): used as the secondary vector store alongside pgvector, benchmarked on latency and compared on operational complexity. **Version ≥ 1.27.0 is required** for the v4 Python client.
 
 ---
 
 ## Quick Reference: Where Each Technology Appears
 
 | Technology | Module | Role |
-|---|---|---|
+| --- | --- | --- |
 | DuckDB | M1 | Feature store backend |
 | NumPy / Pandas | M1 | Event generation + feature computation |
 | PyTorch | M2 | PropensityModel training and inference |
@@ -660,7 +774,7 @@ Now that the environment is set up and the vocabulary is clear, the series build
 
 Each article is self-contained. The code builds on the previous module but each post explains its inputs and outputs clearly enough that you can start anywhere. If you get stuck on terminology, come back here.
 
-**[→ Start with Article 1: How I Rebuilt a Loyalty Platform's Feature Pipeline in a Weekend](#)**
+→ Start with Article 1: How I Rebuilt a Loyalty Platform's Feature Pipeline in a Weekend
 
 ---
 

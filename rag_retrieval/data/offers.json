@@ -1,0 +1,2002 @@
+[
+  {
+    "id": "offer_0001",
+    "title": "Free Pastry with Any Purchase \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.1,
+    "discount_pct": 11,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0002",
+    "title": "Lunch Combo Saver",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 37,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0003",
+    "title": "Loyalty Breakfast Bundle",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.31,
+    "discount_pct": 22,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0004",
+    "title": "Sparkling Water Freebie \u2014 Limited Time",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 26,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0005",
+    "title": "Lunch Combo Saver",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.42,
+    "discount_pct": 7,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0006",
+    "title": "Winter Warmer Bonus \u2014 App Exclusive",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.21,
+    "discount_pct": 28,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0007",
+    "title": "Happy Hour Smoothie Discount",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.54,
+    "discount_pct": 10,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0008",
+    "title": "Lunch Combo Saver \u2014 Limited Time",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.58,
+    "discount_pct": 15,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0009",
+    "title": "Gift Card Bonus Points \u2014 Limited Time",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.45,
+    "discount_pct": 15,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0010",
+    "title": "Cold Brew Loyalty Perk \u2014 App Exclusive",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.69,
+    "discount_pct": 40,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0011",
+    "title": "Reusable Cup Discount \u2014 Members Only",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.28,
+    "discount_pct": 9,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0012",
+    "title": "New Year Loyalty Bonus \u2014 Members Only",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.28,
+    "discount_pct": 34,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0013",
+    "title": "Loyalty Tumbler Deal \u2014 Members Only",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.38,
+    "discount_pct": 32,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0014",
+    "title": "App-Exclusive Star Boost \u2014 Members Only",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 8,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0015",
+    "title": "Cold Brew Loyalty Perk \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.27,
+    "discount_pct": 34,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0016",
+    "title": "Reusable Cup Discount",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.53,
+    "discount_pct": 26,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0017",
+    "title": "Travel Mug Loyalty Perk \u2014 Members Only",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.67,
+    "discount_pct": 21,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0018",
+    "title": "Happy Hour Smoothie Discount \u2014 Limited Time",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.43,
+    "discount_pct": 14,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0019",
+    "title": "Free Espresso Shot Upgrade",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 28,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0020",
+    "title": "Free Espresso Shot Upgrade \u2014 Members Only",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.06,
+    "discount_pct": 36,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0021",
+    "title": "Spring Bloom Reward \u2014 Members Only",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.66,
+    "discount_pct": 15,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0022",
+    "title": "Valentine's Day Special \u2014 Members Only",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.48,
+    "discount_pct": 24,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0023",
+    "title": "Apparel Member Discount",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 9,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0024",
+    "title": "Loyalty Breakfast Bundle",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.05,
+    "discount_pct": 8,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0025",
+    "title": "Free Pastry with Any Purchase \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 36,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0026",
+    "title": "Spring Bloom Reward",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 35,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0027",
+    "title": "Happy Hour Smoothie Discount",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.25,
+    "discount_pct": 31,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0028",
+    "title": "Double Points on Bakery Items",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.24,
+    "discount_pct": 11,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0029",
+    "title": "Tea Time Triple Points",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 22,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0030",
+    "title": "Happy Hour Smoothie Discount \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.04,
+    "discount_pct": 39,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0031",
+    "title": "Loyalty Breakfast Bundle \u2014 Members Only",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.34,
+    "discount_pct": 30,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0032",
+    "title": "Sparkling Water Freebie",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.65,
+    "discount_pct": 34,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0033",
+    "title": "Tier Upgrade Star Boost \u2014 Members Only",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 8,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0034",
+    "title": "Summer Refreshment Deal \u2014 Limited Time",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.41,
+    "discount_pct": 37,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0035",
+    "title": "Free Espresso Shot Upgrade",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.05,
+    "discount_pct": 9,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0036",
+    "title": "Birthday Bonus Stars",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.42,
+    "discount_pct": 10,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0037",
+    "title": "New Year Loyalty Bonus \u2014 Limited Time",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.5,
+    "discount_pct": 20,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0038",
+    "title": "Milestone Reward Unlock \u2014 Limited Time",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.65,
+    "discount_pct": 9,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0039",
+    "title": "Birthday Bonus Stars",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 13,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0040",
+    "title": "Loyalty Breakfast Bundle \u2014 Limited Time",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.31,
+    "discount_pct": 39,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0041",
+    "title": "Summer Refreshment Deal",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.07,
+    "discount_pct": 13,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0042",
+    "title": "Double Points on Bakery Items",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.2,
+    "discount_pct": 18,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0043",
+    "title": "Seasonal Latte Bonus",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.63,
+    "discount_pct": 8,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0044",
+    "title": "Weekend Star Multiplier",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.54,
+    "discount_pct": 21,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0045",
+    "title": "Monthly Star Challenge",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.05,
+    "discount_pct": 14,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0046",
+    "title": "Snack Attack Deal",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 7,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0047",
+    "title": "Reusable Cup Discount \u2014 Limited Time",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 11,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0048",
+    "title": "Valentine's Day Special",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.65,
+    "discount_pct": 20,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0049",
+    "title": "Sparkling Water Freebie",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.65,
+    "discount_pct": 31,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0050",
+    "title": "Loyalty Tumbler Deal",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.6,
+    "discount_pct": 19,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0051",
+    "title": "App-Exclusive Star Boost \u2014 Limited Time",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.02,
+    "discount_pct": 17,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0052",
+    "title": "Merchandise Bundle Reward",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.45,
+    "discount_pct": 30,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0053",
+    "title": "Reusable Cup Discount",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.41,
+    "discount_pct": 21,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0054",
+    "title": "Lunch Combo Saver \u2014 Limited Time",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.31,
+    "discount_pct": 37,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0055",
+    "title": "Referral Stars Bonus \u2014 Limited Time",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.31,
+    "discount_pct": 38,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0056",
+    "title": "Juice Bar Reward \u2014 App Exclusive",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.64,
+    "discount_pct": 25,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0057",
+    "title": "Merchandise Bundle Reward \u2014 App Exclusive",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.49,
+    "discount_pct": 40,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0058",
+    "title": "Sparkling Water Freebie \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.63,
+    "discount_pct": 24,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0059",
+    "title": "Summer Refreshment Deal \u2014 Limited Time",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 25,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0060",
+    "title": "Tier Upgrade Star Boost \u2014 Members Only",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.56,
+    "discount_pct": 15,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0061",
+    "title": "Eco Bag Double Points",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.22,
+    "discount_pct": 17,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0062",
+    "title": "Free Pastry with Any Purchase \u2014 Members Only",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.59,
+    "discount_pct": 9,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0063",
+    "title": "Referral Stars Bonus \u2014 App Exclusive",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 5,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0064",
+    "title": "Referral Stars Bonus \u2014 Members Only",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.33,
+    "discount_pct": 40,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0065",
+    "title": "Healthy Bites Reward \u2014 Members Only",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.37,
+    "discount_pct": 40,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0066",
+    "title": "Apparel Member Discount",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 40,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0067",
+    "title": "Hot Chocolate Holiday Deal \u2014 App Exclusive",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.59,
+    "discount_pct": 22,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0068",
+    "title": "Referral Stars Bonus \u2014 Limited Time",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.5,
+    "discount_pct": 20,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0069",
+    "title": "Eco Bag Double Points",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.11,
+    "discount_pct": 29,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0070",
+    "title": "Happy Hour Smoothie Discount \u2014 App Exclusive",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.38,
+    "discount_pct": 31,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0071",
+    "title": "Sparkling Water Freebie \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 29,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0072",
+    "title": "Snack Attack Deal \u2014 Limited Time",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.38,
+    "discount_pct": 39,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0073",
+    "title": "Hot Chocolate Holiday Deal \u2014 Members Only",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.34,
+    "discount_pct": 29,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0074",
+    "title": "Milestone Reward Unlock \u2014 App Exclusive",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.37,
+    "discount_pct": 30,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0075",
+    "title": "Summer Refreshment Deal",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.09,
+    "discount_pct": 34,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0076",
+    "title": "Weekend Brunch Bonus \u2014 App Exclusive",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 26,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0077",
+    "title": "Travel Mug Loyalty Perk \u2014 Limited Time",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 39,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0078",
+    "title": "Gift Card Bonus Points",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.53,
+    "discount_pct": 20,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0079",
+    "title": "Buy 2 Sandwiches Get 1 Free \u2014 Members Only",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.47,
+    "discount_pct": 18,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0080",
+    "title": "Eco Bag Double Points \u2014 Members Only",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.67,
+    "discount_pct": 12,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0081",
+    "title": "Branded Tote Bag Offer",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.4,
+    "discount_pct": 29,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0082",
+    "title": "Happy Hour Smoothie Discount",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 24,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0083",
+    "title": "Free Pastry with Any Purchase \u2014 Limited Time",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.46,
+    "discount_pct": 9,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0084",
+    "title": "Reusable Cup Discount \u2014 App Exclusive",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 28,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0085",
+    "title": "Sparkling Water Freebie \u2014 Members Only",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.68,
+    "discount_pct": 22,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0086",
+    "title": "Back-to-School Deal \u2014 App Exclusive",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.41,
+    "discount_pct": 25,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0087",
+    "title": "Weekend Brunch Bonus \u2014 App Exclusive",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.4,
+    "discount_pct": 29,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0088",
+    "title": "Healthy Bites Reward \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 21,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0089",
+    "title": "Merchandise Bundle Reward",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.66,
+    "discount_pct": 10,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0090",
+    "title": "Tier Upgrade Star Boost",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.33,
+    "discount_pct": 36,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0091",
+    "title": "Double Points on Bakery Items \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.48,
+    "discount_pct": 24,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0092",
+    "title": "Apparel Member Discount",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 40,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0093",
+    "title": "Apparel Member Discount \u2014 Limited Time",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.16,
+    "discount_pct": 17,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0094",
+    "title": "Buy 2 Sandwiches Get 1 Free \u2014 Members Only",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.34,
+    "discount_pct": 38,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0095",
+    "title": "Branded Tote Bag Offer \u2014 Members Only",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.25,
+    "discount_pct": 24,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0096",
+    "title": "Spring Bloom Reward \u2014 Limited Time",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.39,
+    "discount_pct": 13,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0097",
+    "title": "Free Pastry with Any Purchase",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.34,
+    "discount_pct": 26,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0098",
+    "title": "Weekend Brunch Bonus \u2014 App Exclusive",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.28,
+    "discount_pct": 9,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0099",
+    "title": "Buy 2 Sandwiches Get 1 Free \u2014 Members Only",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.06,
+    "discount_pct": 20,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0100",
+    "title": "Valentine's Day Special",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.16,
+    "discount_pct": 38,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0101",
+    "title": "Tier Upgrade Star Boost \u2014 Limited Time",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.21,
+    "discount_pct": 8,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0102",
+    "title": "Loyalty Breakfast Bundle \u2014 Members Only",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.06,
+    "discount_pct": 20,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0103",
+    "title": "Winter Warmer Bonus \u2014 Members Only",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 35,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0104",
+    "title": "Loyalty Breakfast Bundle \u2014 Limited Time",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.49,
+    "discount_pct": 34,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0105",
+    "title": "Seasonal Latte Bonus",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 39,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0106",
+    "title": "Seasonal Latte Bonus \u2014 Members Only",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.12,
+    "discount_pct": 24,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0107",
+    "title": "Holiday Season Offer \u2014 App Exclusive",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.48,
+    "discount_pct": 30,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0108",
+    "title": "Back-to-School Deal \u2014 App Exclusive",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.03,
+    "discount_pct": 32,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0109",
+    "title": "Holiday Season Offer",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.67,
+    "discount_pct": 6,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0110",
+    "title": "Summer Refreshment Deal \u2014 Members Only",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.46,
+    "discount_pct": 22,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0111",
+    "title": "Valentine's Day Special \u2014 App Exclusive",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.24,
+    "discount_pct": 26,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0112",
+    "title": "Buy 2 Sandwiches Get 1 Free \u2014 Limited Time",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 30,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0113",
+    "title": "Healthy Bites Reward",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.23,
+    "discount_pct": 30,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0114",
+    "title": "Healthy Bites Reward \u2014 App Exclusive",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.36,
+    "discount_pct": 36,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0115",
+    "title": "Loyalty Breakfast Bundle \u2014 Limited Time",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.65,
+    "discount_pct": 33,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0116",
+    "title": "Free Pastry with Any Purchase",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.11,
+    "discount_pct": 40,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0117",
+    "title": "Valentine's Day Special",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 12,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0118",
+    "title": "Weekend Star Multiplier",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.29,
+    "discount_pct": 35,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0119",
+    "title": "Hot Chocolate Holiday Deal",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.13,
+    "discount_pct": 37,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0120",
+    "title": "Weekend Brunch Bonus \u2014 App Exclusive",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.19,
+    "discount_pct": 5,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0121",
+    "title": "Apparel Member Discount \u2014 Members Only",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.34,
+    "discount_pct": 26,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0122",
+    "title": "Valentine's Day Special \u2014 App Exclusive",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.69,
+    "discount_pct": 20,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0123",
+    "title": "Referral Stars Bonus \u2014 App Exclusive",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.52,
+    "discount_pct": 29,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0124",
+    "title": "Hot Chocolate Holiday Deal",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.68,
+    "discount_pct": 26,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0125",
+    "title": "Birthday Bonus Stars",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.51,
+    "discount_pct": 31,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0126",
+    "title": "Healthy Bites Reward \u2014 Limited Time",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.48,
+    "discount_pct": 10,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0127",
+    "title": "Valentine's Day Special \u2014 Limited Time",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.62,
+    "discount_pct": 36,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0128",
+    "title": "Double Points on Bakery Items \u2014 Members Only",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.64,
+    "discount_pct": 19,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0129",
+    "title": "Birthday Bonus Stars",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.49,
+    "discount_pct": 6,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0130",
+    "title": "Reusable Cup Discount \u2014 Limited Time",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 20,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0131",
+    "title": "Milestone Reward Unlock \u2014 Members Only",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.43,
+    "discount_pct": 29,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0132",
+    "title": "Hot Chocolate Holiday Deal",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 21,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0133",
+    "title": "Reusable Cup Discount \u2014 App Exclusive",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.38,
+    "discount_pct": 9,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0134",
+    "title": "Merchandise Bundle Reward \u2014 App Exclusive",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 24,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0135",
+    "title": "Tier Upgrade Star Boost",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.4,
+    "discount_pct": 23,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0136",
+    "title": "Lunch Combo Saver \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.61,
+    "discount_pct": 8,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0137",
+    "title": "Weekend Star Multiplier \u2014 Members Only",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 17,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0138",
+    "title": "Loyalty Tumbler Deal",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.03,
+    "discount_pct": 33,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0139",
+    "title": "New Year Loyalty Bonus \u2014 Members Only",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.23,
+    "discount_pct": 31,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0140",
+    "title": "Cold Brew Loyalty Perk",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 22,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0141",
+    "title": "Apparel Member Discount \u2014 Limited Time",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.56,
+    "discount_pct": 34,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0142",
+    "title": "Tea Time Triple Points \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.06,
+    "discount_pct": 30,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0143",
+    "title": "Branded Tote Bag Offer \u2014 App Exclusive",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.52,
+    "discount_pct": 21,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0144",
+    "title": "App-Exclusive Star Boost",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.33,
+    "discount_pct": 40,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0145",
+    "title": "Autumn Harvest Perk",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.64,
+    "discount_pct": 24,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0146",
+    "title": "Buy 2 Sandwiches Get 1 Free",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.7,
+    "discount_pct": 12,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0147",
+    "title": "Cold Brew Loyalty Perk \u2014 App Exclusive",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.47,
+    "discount_pct": 39,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0148",
+    "title": "Spring Bloom Reward \u2014 App Exclusive",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.58,
+    "discount_pct": 31,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0149",
+    "title": "Snack Attack Deal \u2014 Members Only",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "all",
+    "min_propensity_threshold": 0.67,
+    "discount_pct": 28,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0150",
+    "title": "Eco Bag Double Points",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.13,
+    "discount_pct": 12,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0151",
+    "title": "Loyalty Breakfast Bundle",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.55,
+    "discount_pct": 20,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0152",
+    "title": "Autumn Harvest Perk",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.41,
+    "discount_pct": 19,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0153",
+    "title": "Free Espresso Shot Upgrade \u2014 Limited Time",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.38,
+    "discount_pct": 16,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0154",
+    "title": "Buy 2 Sandwiches Get 1 Free",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.41,
+    "discount_pct": 6,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0155",
+    "title": "Reusable Cup Discount \u2014 Members Only",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "all",
+    "min_propensity_threshold": 0.37,
+    "discount_pct": 9,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0156",
+    "title": "App-Exclusive Star Boost",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.32,
+    "discount_pct": 19,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0157",
+    "title": "Weekend Brunch Bonus \u2014 App Exclusive",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.04,
+    "discount_pct": 35,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0158",
+    "title": "Birthday Bonus Stars \u2014 App Exclusive",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.05,
+    "discount_pct": 10,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0159",
+    "title": "Spring Bloom Reward",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.44,
+    "discount_pct": 40,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0160",
+    "title": "Weekend Star Multiplier \u2014 App Exclusive",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 12,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0161",
+    "title": "Sparkling Water Freebie \u2014 App Exclusive",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.24,
+    "discount_pct": 34,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0162",
+    "title": "Birthday Bonus Stars \u2014 Limited Time",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.47,
+    "discount_pct": 28,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0163",
+    "title": "Birthday Bonus Stars",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.3,
+    "discount_pct": 28,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0164",
+    "title": "Summer Refreshment Deal",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.23,
+    "discount_pct": 12,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0165",
+    "title": "Travel Mug Loyalty Perk",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.22,
+    "discount_pct": 11,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0166",
+    "title": "Autumn Harvest Perk \u2014 Members Only",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.16,
+    "discount_pct": 11,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0167",
+    "title": "New Year Loyalty Bonus",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.16,
+    "discount_pct": 32,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0168",
+    "title": "Summer Refreshment Deal",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.19,
+    "discount_pct": 16,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0169",
+    "title": "Eco Bag Double Points \u2014 Limited Time",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.61,
+    "discount_pct": 30,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0170",
+    "title": "Free Espresso Shot Upgrade",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.15,
+    "discount_pct": 31,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0171",
+    "title": "Loyalty Tumbler Deal \u2014 Limited Time",
+    "description": "Members receive an exclusive discount on our limited-edition tote bag. Available while stocks last in-store and through the mobile app. Each bag purchased contributes to our sustainability fund.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.23,
+    "discount_pct": 10,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0172",
+    "title": "Cold Brew Loyalty Perk",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.06,
+    "discount_pct": 33,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0173",
+    "title": "Tier Upgrade Star Boost \u2014 App Exclusive",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.53,
+    "discount_pct": 12,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0174",
+    "title": "Birthday Bonus Stars \u2014 Limited Time",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.42,
+    "discount_pct": 38,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0175",
+    "title": "Loyalty Breakfast Bundle \u2014 App Exclusive",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 24,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0176",
+    "title": "Seasonal Latte Bonus \u2014 Limited Time",
+    "description": "Get 20% off any smoothie between 2 pm and 5 pm on weekdays. Offer applies to regular and large sizes across the full smoothie menu. Not valid with other beverage promotions.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 32,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0177",
+    "title": "Sparkling Water Freebie",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 27,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0178",
+    "title": "5x Stars on Next Purchase \u2014 App Exclusive",
+    "description": "Earn 5x loyalty stars on your very next purchase after activating this offer. The multiplier applies to the full transaction value including food and beverages. Bonus stars are credited to your account within 48 hours.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.64,
+    "discount_pct": 25,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0179",
+    "title": "Monthly Star Challenge \u2014 App Exclusive",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.28,
+    "discount_pct": 25,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0180",
+    "title": "Back-to-School Deal \u2014 Limited Time",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.59,
+    "discount_pct": 20,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0181",
+    "title": "Valentine's Day Special",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.61,
+    "discount_pct": 26,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0182",
+    "title": "Loyalty Tumbler Deal",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.08,
+    "discount_pct": 37,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0183",
+    "title": "Eco Bag Double Points \u2014 Members Only",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.1,
+    "discount_pct": 17,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0184",
+    "title": "Spring Bloom Reward",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 33,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0185",
+    "title": "New Year Loyalty Bonus \u2014 Limited Time",
+    "description": "Cool down this summer with 25% off any iced beverage of your choice. Offer runs from June through August at all participating stores. Stackable with your standard member discount for extra savings.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.05,
+    "discount_pct": 33,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0186",
+    "title": "Reusable Cup Discount \u2014 Limited Time",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.22,
+    "discount_pct": 33,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0187",
+    "title": "Snack Attack Deal \u2014 Limited Time",
+    "description": "Enjoy a complimentary pastry of your choice when you spend $10 or more. This offer is valid on freshly baked items only and excludes packaged goods. Redeem in a single transaction at any participating location.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.6,
+    "discount_pct": 10,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0188",
+    "title": "Valentine's Day Special \u2014 App Exclusive",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.67,
+    "discount_pct": 7,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0189",
+    "title": "Autumn Harvest Perk \u2014 Limited Time",
+    "description": "Celebrate the new season with bonus stars on seasonal menu items. All limited-edition spring and autumn drinks qualify for double points. Seasonal menu items are highlighted in the app for easy identification.",
+    "category": "seasonal",
+    "channel": "all",
+    "min_propensity_threshold": 0.35,
+    "discount_pct": 8,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0190",
+    "title": "Snack Attack Deal",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.12,
+    "discount_pct": 20,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0191",
+    "title": "Milestone Reward Unlock \u2014 Limited Time",
+    "description": "Celebrate your birthday month with a special star bonus on every purchase. Stars are automatically doubled throughout your birthday month at checkout. Birthday must be verified in your loyalty profile to qualify.",
+    "category": "bonus_stars",
+    "channel": "all",
+    "min_propensity_threshold": 0.27,
+    "discount_pct": 26,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0192",
+    "title": "Snack Attack Deal",
+    "description": "Earn double loyalty points on every bakery purchase this month. Points are credited within 24 hours of your transaction. Combine with other food offers for maximum rewards.",
+    "category": "food",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.39,
+    "discount_pct": 29,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0193",
+    "title": "Loyalty Tumbler Deal \u2014 Limited Time",
+    "description": "Purchase a branded reusable cup and save 15% on the retail price. Use your new cup on the same visit to earn an additional 50 bonus stars. Helping the environment has never been more rewarding.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.46,
+    "discount_pct": 27,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0194",
+    "title": "Milestone Reward Unlock",
+    "description": "Reach your next loyalty tier faster with a one-time star multiplier boost. Activated automatically when you are within 200 stars of your next tier. Contact support if the bonus does not appear within 72 hours.",
+    "category": "bonus_stars",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.22,
+    "discount_pct": 29,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0195",
+    "title": "Happy Hour Smoothie Discount \u2014 App Exclusive",
+    "description": "Enjoy triple loyalty points when you order cold brew coffee this week. Points are awarded per unit purchased with no cap on daily transactions. Available at all caf\u00e9 locations nationwide.",
+    "category": "beverage",
+    "channel": "all",
+    "min_propensity_threshold": 0.01,
+    "discount_pct": 24,
+    "expiry_days": 14
+  },
+  {
+    "id": "offer_0196",
+    "title": "Juice Bar Reward \u2014 App Exclusive",
+    "description": "Upgrade your espresso to a double shot at no extra charge on your next visit. Simply show this offer at the counter before ordering. One upgrade per customer per day.",
+    "category": "beverage",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.7,
+    "discount_pct": 14,
+    "expiry_days": 7
+  },
+  {
+    "id": "offer_0197",
+    "title": "Branded Tote Bag Offer",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.62,
+    "discount_pct": 7,
+    "expiry_days": 30
+  },
+  {
+    "id": "offer_0198",
+    "title": "Spring Bloom Reward",
+    "description": "Warm up this winter with a free syrup shot in any hot drink. Choose from vanilla, caramel, or hazelnut at no additional cost. Valid throughout December and January at all locations.",
+    "category": "seasonal",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.11,
+    "discount_pct": 15,
+    "expiry_days": 60
+  },
+  {
+    "id": "offer_0199",
+    "title": "Lunch Combo Saver \u2014 Limited Time",
+    "description": "Purchase any two full-priced sandwiches and receive the third item free. Discount applies to the lowest-priced sandwich automatically. Valid for dine-in and take-away orders.",
+    "category": "food",
+    "channel": "in-store",
+    "min_propensity_threshold": 0.17,
+    "discount_pct": 33,
+    "expiry_days": 90
+  },
+  {
+    "id": "offer_0200",
+    "title": "Apparel Member Discount \u2014 Members Only",
+    "description": "Redeem points towards a branded travel mug at a reduced star cost this season. Choose from three colours exclusive to loyalty programme members. Offer valid until end of the current quarter.",
+    "category": "merchandise",
+    "channel": "mobile",
+    "min_propensity_threshold": 0.22,
+    "discount_pct": 35,
+    "expiry_days": 14
+  }
+]

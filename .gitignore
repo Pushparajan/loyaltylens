@@ -2,18 +2,25 @@
 __pycache__/
 *.py[cod]
 *.pyo
-.venv/
 *.egg-info/
 dist/
 build/
+
+# Virtual environments — canonical venv is .venv/ at repo root.
+# Sub-module venvs (data_pipeline/.venv, propensity_model/.venv) are legacy;
+# use `uv pip install --python .venv/Scripts/python.exe` to install into root.
+.venv/
+*/.venv/
 
 # Data — ignore generated files, keep directory structure
 data/raw/*.parquet
 data/processed/*.parquet
 data/*.duckdb
 
-# Env
+# Env — single source of truth is .env at repo root; never commit it.
+# Copy .env.example → .env and fill in real values.
 .env
+**/.env
 
 # Testing / coverage
 .coverage

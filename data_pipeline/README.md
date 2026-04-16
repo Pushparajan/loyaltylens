@@ -21,10 +21,12 @@ Extract data from source systems (POS, CRM, e-commerce APIs), apply schema valid
 ## Key Classes
 
 | Class | Module | Responsibility |
-| --------------------- | ---------------------- | --------------------------------------- |
-| `TransactionIngester` | `ingester.py`          | Parse, validate, and upsert transactions |
-| `CustomerDataLoader`  | `loader.py`            | Load and reconcile customer profiles    |
-| `PipelineOrchestrator`| `orchestrator.py`      | Compose Prefect flows, handle scheduling |
+| --- | --- | --- |
+| `TransactionIngester` | `ingester.py` | Parse, validate, and upsert transactions |
+| `CustomerDataLoader` | `loader.py` | Load and reconcile customer profiles |
+| `PipelineOrchestrator` | `orchestrator.py` | Compose Prefect flows, handle scheduling |
+
+---
 
 ## Running Locally
 
@@ -33,93 +35,81 @@ Extract data from source systems (POS, CRM, e-commerce APIs), apply schema valid
 - Python 3.11+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
 
+---
+
 ### 1. Start Docker Desktop
 
-Open **Docker Desktop** from the Start menu (Windows) or Applications (macOS) and wait until the system-tray icon tooltip says **"Docker Desktop is running"**. This takes 30–60 seconds on first launch.
+Open **Docker Desktop** from the Start menu (Windows) or Applications (macOS) and wait until the system-tray icon says **"Docker Desktop is running"** (30–60 seconds on first launch).
 
-You can verify the daemon is up with:
+Verify the daemon is up:
 
 ```bash
 docker info
 ```
 
-If you see `ERROR: Cannot connect to the Docker daemon`, Docker Desktop is not ready yet.
+---
 
 ### 2. Start infrastructure
 
-```bash
-docker compose up -d
-```
+```powershell
+docker compose up -d postgres weaviate redis
 
-Wait for all three services to be healthy:
-
-```bash
+# Wait for all three to show (healthy)
 docker compose ps
 ```
 
-All rows should show `healthy` in the `STATUS` column before proceeding:
+---
 
-```text
-NAME                     STATUS
-loyaltylens_postgres     running (healthy)
-loyaltylens_redis        running (healthy)
-loyaltylens_weaviate     running (healthy)
-```
+### 3. Create the Python environment
 
-### 2. Create a Python environment
-
-Install [uv](https://docs.astral.sh/uv/) if you don't have it (no existing Python required):
+Always use the **repo-root** `.venv` — sub-module venvs (`data_pipeline/.venv`, etc.) are legacy and should not be used.
 
 ```powershell
-# Windows (PowerShell)
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-```bash
-# macOS / Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Restart your terminal after installation so `uv` is on PATH.
-
-Create and activate a virtual environment at the repo root:
-
-```bash
+# Windows (PowerShell) — run from c:\Projects\loyaltylens
 uv venv .venv --python 3.11
-# Windows
-.venv\Scripts\activate
+.venv\Scripts\Activate.ps1
+
 # macOS / Linux
+uv venv .venv --python 3.11
 source .venv/bin/activate
 ```
+
+> **Windows execution policy:** If the script is blocked, run once:
+> `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+
+---
 
 ### 4. Install dependencies
 
 Run from the **repo root** (`c:\Projects\loyaltylens`), not from inside `data_pipeline/`:
 
-```bash
-cd ..   # if you are currently inside data_pipeline/
-uv pip install -e ".[dev]"
-# or, without the dev extras:
-uv pip install -r data_pipeline/requirements.txt
+```powershell
+uv sync --dev
+uv pip install -e .      # makes shared/ importable without PYTHONPATH
 ```
+
+---
 
 ### 5. Configure environment
 
-Copy or create a `.env` file at the repo root. The defaults in `shared/config.py` work out-of-the-box with the Docker Compose stack, so no changes are required unless you override ports or credentials:
+One `.env` at the **repo root** — all modules share it. Copy the template:
 
-```dotenv
-POSTGRES_URL=postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens
-REDIS_URL=redis://localhost:6379
-WEAVIATE_URL=http://localhost:8080
-RAW_EVENTS_PATH=data/raw/events.parquet
-PROCESSED_FEATURES_PATH=data/processed/features.parquet
+```powershell
+Copy-Item .env.example .env   # Windows
+# cp .env.example .env        # macOS / Linux
 ```
+
+The defaults work out-of-the-box with the Docker Compose stack. The only values you must fill in are `OPENAI_API_KEY` and (optionally) `HF_TOKEN`. All DB URLs and ports are pre-configured.
+
+> **Never create a `data_pipeline/.env`** — `shared.config.Settings` reads the root `.env` automatically.
+
+---
 
 ### 6. Create database tables
 
-Apply the schema to the running Postgres container.
+The `docker/init-pgvector.sql` script enables the `vector` extension automatically on first start. Apply the full schema:
 
-**Windows (PowerShell)** — `<` redirection is not supported, use `Get-Content`:
+**Windows (PowerShell):**
 
 ```powershell
 Get-Content db/schema.sql | docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens
@@ -131,23 +121,19 @@ Get-Content db/schema.sql | docker exec -i loyaltylens_postgres psql -U loyaltyl
 docker exec -i loyaltylens_postgres psql -U loyaltylens -d loyaltylens < db/schema.sql
 ```
 
-Or if `psql` is on your PATH:
+---
 
-```bash
-psql postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens -f db/schema.sql
-```
-
-### 8. Generate synthetic data
+### 7. Generate synthetic data
 
 ```bash
 python -m data_pipeline.generate
 ```
 
-This writes `50 000` synthetic loyalty events to `data/raw/events.parquet` (path controlled by `RAW_EVENTS_PATH`).
+Writes 50,000 synthetic loyalty events to `data/raw/events.parquet`.
 
-### 9. Run the pipeline
+---
 
-Use the smoke-test script at the repo root to push a small batch of synthetic records through the full ETL flow:
+### 8. Run the pipeline
 
 ```bash
 python run_pipeline.py
@@ -159,7 +145,7 @@ Expected output:
 Pipeline result: {'transactions': 2, 'customers': 2}
 ```
 
-Or trigger the orchestrator programmatically:
+Or trigger programmatically:
 
 ```python
 from data_pipeline.orchestrator import PipelineOrchestrator
@@ -170,19 +156,30 @@ PipelineOrchestrator().run(
 )
 ```
 
-### 10. Verify
+---
 
-Connect to Postgres and check row counts.
+### 9. Verify
 
 **Windows (PowerShell):**
 
 ```powershell
-docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
+docker exec loyaltylens_postgres psql -U loyaltylens -d loyaltylens `
+  -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
 ```
 
-**macOS / Linux (or if `psql` is on PATH):**
+**macOS / Linux:**
 
 ```bash
 psql postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens \
   -c "SELECT COUNT(*) FROM transactions; SELECT COUNT(*) FROM customers;"
+```
+
+---
+
+### Restart from scratch
+
+```powershell
+docker compose down -v
+docker compose up -d postgres weaviate redis
+python run_pipeline.py
 ```

@@ -20,8 +20,60 @@ Close the ML loop: customer interactions (opens, clicks, redemptions, ignores) a
 
 ## Key Classes
 
-| Class               | Module          | Responsibility |
-| ------------------- | --------------- | ----------------------------------------------- |
-| `FeedbackCollector` | `collector.py`  | Ingest and validate raw interaction events       |
-| `FeedbackProcessor` | `processor.py`  | Aggregate events into labelled training signals  |
-| `ModelUpdater`      | `updater.py`    | Evaluate drift and trigger retraining pipeline   |
+| Class | Module | Responsibility |
+| --- | --- | --- |
+| `FeedbackCollector` | `collector.py` | Ingest and validate raw interaction events |
+| `FeedbackProcessor` | `processor.py` | Aggregate events into labelled training signals |
+| `ModelUpdater` | `updater.py` | Evaluate drift and trigger retraining pipeline |
+
+---
+
+## Running Locally
+
+### 1. Environment
+
+One `.env` at the **repo root** — no module-level env file needed.
+
+```dotenv
+POSTGRES_URL=postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens
+REDIS_URL=redis://localhost:6379
+PORT_FEEDBACK_LOOP=8005
+```
+
+---
+
+### 2. Install dependencies
+
+```powershell
+uv sync --dev
+uv pip install -e .
+```
+
+---
+
+### 3. Start infrastructure
+
+```powershell
+docker compose up -d postgres redis
+docker compose ps   # wait for (healthy)
+```
+
+---
+
+### 4. Start the API
+
+```powershell
+# Windows
+python -m uvicorn feedback_loop.api:app --host 127.0.0.1 --port 8005 --reload
+
+# macOS / Linux
+python -m uvicorn feedback_loop.api:app --host 0.0.0.0 --port 8005 --reload
+```
+
+---
+
+### 5. Run tests
+
+```bash
+python -m pytest tests/ -k feedback -v
+```

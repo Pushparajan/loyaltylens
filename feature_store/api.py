@@ -1,7 +1,7 @@
 """FastAPI service exposing feature vectors from the DuckDB feature store.
 
 Run with:
-    uvicorn feature_store.api:app --reload --port 8002
+    uvicorn feature_store.api:app --reload --port 8001
 """
 
 from __future__ import annotations

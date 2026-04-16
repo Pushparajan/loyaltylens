@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from prometheus_client import Counter, Gauge, Histogram, start_http_server
 
+from shared.config import get_settings
 from shared.logger import get_logger
 
 logger = get_logger(__name__)
@@ -46,6 +47,7 @@ class MetricsCollector:
         token_counter.labels(model=model, type="prompt").inc(prompt)
         token_counter.labels(model=model, type="completion").inc(completion)
 
-    def start_server(self, port: int = 8001) -> None:
+    def start_server(self, port: int | None = None) -> None:
+        port = port if port is not None else get_settings().port_metrics
         start_http_server(port)
         logger.info("metrics_server_started", port=port)

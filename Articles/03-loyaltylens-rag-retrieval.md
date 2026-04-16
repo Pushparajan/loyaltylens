@@ -77,7 +77,7 @@ from sentence_transformers import SentenceTransformer
 import psycopg2
 import weaviate
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 class EmbeddingPipeline:
     def embed_offers(self, offers: list[dict]) -> None:
@@ -89,20 +89,34 @@ class EmbeddingPipeline:
         self._write_to_weaviate(offers, embeddings)
 
     def _write_to_pgvector(self, offers, embeddings):
-        # pgvector stores embeddings as a native vector type
         with self.pg_conn.cursor() as cur:
             for offer, embedding in zip(offers, embeddings):
                 cur.execute("""
                     INSERT INTO offer_embeddings
-                    (id, title, category, channel, min_propensity, embedding)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    (id, title, category, channel, min_propensity_threshold,
+                     discount_pct, expiry_days, embedding)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (id) DO UPDATE
                     SET embedding = EXCLUDED.embedding
                 """, (
                     offer["id"], offer["title"], offer["category"],
                     offer["channel"], offer["min_propensity_threshold"],
+                    offer["discount_pct"], offer["expiry_days"],
                     embedding.tolist()
                 ))
+```
+
+Weaviate integration requires the v4 Python client and server **≥ 1.27.0** (the repo ships 1.28.2). The client connects over both HTTP (port 8080) and gRPC (port 50051) — both must be reachable:
+
+```python
+# weaviate_client.py
+import weaviate
+from weaviate.connect import ConnectionParams
+
+client = weaviate.connect_to_custom(
+    http_host="localhost", http_port=8080, http_secure=False,
+    grpc_host="localhost", grpc_port=50051, grpc_secure=False,
+)
 ```
 
 One thing worth noting: I index the pgvector table using `ivfflat`:
@@ -119,41 +133,61 @@ With 200 offers this index doesn't matter — a linear scan is faster. With 50,0
 
 ## LangChain Retrieval
 
-LangChain's PGVector integration is the most mature path for PostgreSQL-backed RAG:
+LangChain's PGVector integration is the most mature path for PostgreSQL-backed RAG. One important detail: LangChain manages its own schema (`langchain_pg_collection` / `langchain_pg_embedding` tables) — separate from the custom `offer_embeddings` table written by the embedding pipeline. The retriever uses a dedicated `lc_offer_embeddings` collection and auto-indexes from `offers.json` on first init:
 
 ```python
 # rag_retrieval/langchain_retriever.py
 from langchain_community.vectorstores import PGVector
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.chains import RetrievalQA
+from langchain_huggingface import HuggingFaceEmbeddings  # not langchain_community
+from langchain_core.documents import Document
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
-store = PGVector(
-    connection_string=config.POSTGRES_URL,
-    embedding_function=embeddings,
-    collection_name="offer_embeddings",
-)
+_COLLECTION = "lc_offer_embeddings"
+_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 class LangChainOfferRetriever:
-    def retrieve(
-        self,
-        customer_context: str,
-        propensity_score: float,
-        k: int = 5
-    ) -> list[OfferResult]:
-        # Semantic search with metadata filter
-        results = store.similarity_search_with_score(
-            query=customer_context,
-            k=k * 3,   # oversample, then filter
-            filter={"min_propensity": {"$lte": propensity_score}},
+    def __init__(self, offers_path: Path = _OFFERS_PATH) -> None:
+        self._embeddings = HuggingFaceEmbeddings(model_name=_MODEL_NAME)
+        self._store = PGVector(
+            connection_string=settings.postgres_url,
+            embedding_function=self._embeddings,
+            collection_name=_COLLECTION,
+            pre_delete_collection=False,
         )
-        # Re-rank by (similarity_score * 0.7 + propensity_gap * 0.3)
-        ranked = self._rerank(results, propensity_score)
-        return ranked[:k]
+        if self._collection_empty():
+            self._index_offers(offers_path)  # auto-index on first run
+
+    def _index_offers(self, offers_path: Path) -> None:
+        offers = json.loads(offers_path.read_text())
+        docs = [
+            Document(
+                page_content=o["description"],
+                metadata={"id": o["id"], "title": o["title"],
+                          "category": o["category"],
+                          "min_propensity_threshold": o["min_propensity_threshold"]},
+            )
+            for o in offers
+        ]
+        PGVector.from_documents(
+            documents=docs, embedding=self._embeddings,
+            collection_name=_COLLECTION, connection_string=self._conn,
+            pre_delete_collection=True,
+        )
+
+    def retrieve(self, customer_context: str, propensity: float, k: int = 5):
+        candidates = self._store.similarity_search_with_score(
+            customer_context, k=k * 4,  # oversample, then filter in Python
+        )
+        results = []
+        for doc, score in candidates:
+            if propensity < float(doc.metadata.get("min_propensity_threshold", 0)):
+                continue
+            results.append(OfferResult(..., score=float(score)))
+            if len(results) == k:
+                break
+        return results
 ```
 
-The oversampling + re-ranking pattern is important. Pure cosine similarity doesn't account for the propensity threshold filter; retrieving 3k candidates and re-ranking with a composite score gives better precision@5 than strict filtering on the first k results.
+Two things worth noting. First, the import: `HuggingFaceEmbeddings` moved to `langchain_huggingface` in recent versions — the `langchain_community` path raises a deprecation warning and will be removed. Second, the propensity filter runs in Python after oversampling (k×4 candidates), not as a database-side metadata filter. This is intentional — LangChain's metadata filter syntax for pgvector is inconsistent across versions, while a Python-side filter is predictable and easy to test.
 
 ---
 
@@ -243,37 +277,43 @@ This aligns with how I advise clients in enterprise consulting: don't add infras
 class RetrieveRequest(BaseModel):
     customer_id: str
     propensity_score: float
-    context_text: str          # free-text customer context
+    context_text: str
     retriever: str = "langchain"  # "langchain" | "llamaindex"
 
 class RetrieveResponse(BaseModel):
-    offers: list[OfferResult]
+    offers: list[dict]
     retriever_used: str
     latency_ms: float
-    catalog_size: int
 
 @app.post("/retrieve", response_model=RetrieveResponse)
 async def retrieve_offers(req: RetrieveRequest) -> RetrieveResponse:
     start = time.perf_counter()
-    
-    retriever = (
-        langchain_retriever if req.retriever == "langchain"
-        else llama_retriever
-    )
-    offers = retriever.retrieve(
-        req.context_text, req.propensity_score, k=5
-    )
-    
+    retriever = _get_retriever(req.retriever)
+    offers = retriever.retrieve(req.context_text, req.propensity_score, k=5)
     latency_ms = (time.perf_counter() - start) * 1000
     return RetrieveResponse(
-        offers=offers,
+        offers=[dataclasses.asdict(o) for o in offers],
         retriever_used=req.retriever,
         latency_ms=round(latency_ms, 2),
-        catalog_size=len(all_offers),
     )
 ```
 
-The `retriever` parameter in the request body is the key design decision here. It lets the LLMOps pipeline (Module 5) A/B test retriever configurations in production without a code deploy — you change the default in the config, not the codebase.
+The `retriever` parameter lets the LLMOps pipeline A/B test retriever configurations without a code deploy.
+
+To start the API locally:
+
+```powershell
+# Install the project as an editable package first (required for shared imports)
+uv pip install -e .
+
+# Windows — use 127.0.0.1 (0.0.0.0 triggers WinError 10013)
+python -m uvicorn rag_retrieval.api:app --host 127.0.0.1 --port 8003 --reload --reload-dir rag_retrieval
+
+# Test it
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8003/retrieve `
+    -ContentType 'application/json' `
+    -Body '{"customer_id":"C001","propensity_score":0.65,"context_text":"frequent coffee buyer"}'
+```
 
 ---
 
