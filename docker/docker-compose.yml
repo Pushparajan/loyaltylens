@@ -1,0 +1,340 @@
+# =============================================================================
+# LoyaltyLens — Full Stack Docker Compose
+# =============================================================================
+#
+# Profiles:
+#   infra      — postgres, weaviate, redis only (use when running Python locally)
+#   dev        — infra + app dev container (full environment)
+#   prod       — infra + all module API containers (production-like)
+#   dashboard  — mlflow + streamlit only
+#
+# Quick starts:
+#   Infrastructure only:  docker-compose --profile infra up -d
+#   Full dev environment: docker-compose --profile dev up
+#   All APIs:             docker-compose --profile prod up -d
+#
+# Copy .env.example to .env and fill in API keys before running.
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure: PostgreSQL + pgvector
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    profiles: ["infra", "dev", "prod"]
+    container_name: loyaltylens-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: loyaltylens
+      POSTGRES_PASSWORD: loyaltylens
+      POSTGRES_DB: loyaltylens
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-pgvector.sql:/docker-entrypoint-initdb.d/01-pgvector.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loyaltylens -d loyaltylens"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure: Weaviate
+  # ---------------------------------------------------------------------------
+  weaviate:
+    image: semitechnologies/weaviate:1.24.1
+    profiles: ["infra", "dev", "prod"]
+    container_name: loyaltylens-weaviate
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      DEFAULT_VECTORIZER_MODULE: none
+      ENABLE_MODULES: ""
+      CLUSTER_HOSTNAME: "node1"
+    volumes:
+      - weaviatedata:/var/lib/weaviate
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure: Redis
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    profiles: ["infra", "dev", "prod"]
+    container_name: loyaltylens-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # App: Development container (interactive, source-mounted)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: dev
+    profiles: ["dev"]
+    container_name: loyaltylens-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      weaviate:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: ../.env
+    environment:
+      POSTGRES_URL: postgresql://loyaltylens:loyaltylens@postgres:5432/loyaltylens
+      WEAVIATE_URL: http://weaviate:8080
+      REDIS_URL: redis://redis:6379
+      PYTHONPATH: /app
+    volumes:
+      # Mount source code for live editing — changes reflect instantly
+      - ..:/app
+      # Persist uv cache and Python bytecode between rebuilds
+      - uv-cache:/root/.cache/uv
+      # Persist HuggingFace model downloads — avoids re-downloading on restart
+      - hf-cache:/root/.cache/huggingface
+      # Persist MLflow runs
+      - mlflow-data:/app/mlruns
+    ports:
+      - "8001:8001"   # Feature Store API
+      - "8002:8002"   # Propensity Model API
+      - "8003:8003"   # RAG Retrieval API
+      - "8004:8004"   # LLM Generator API
+      - "8005:8005"   # Feedback Loop API
+      - "5000:5000"   # MLflow UI
+      - "8501:8501"   # Streamlit dashboard
+      - "5173:5173"   # Vite dev server
+    stdin_open: true
+    tty: true
+    command: bash
+
+  # ---------------------------------------------------------------------------
+  # Production API services (one container per module)
+  # ---------------------------------------------------------------------------
+  feature-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["prod"]
+    container_name: loyaltylens-feature-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: ../.env
+    environment:
+      POSTGRES_URL: postgresql://loyaltylens:loyaltylens@postgres:5432/loyaltylens
+      PORT: 8001
+    ports:
+      - "8001:8001"
+    command: ["uvicorn", "feature_store.api:app", "--host", "0.0.0.0", "--port", "8001"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  propensity-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["prod"]
+    container_name: loyaltylens-propensity-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: ../.env
+    environment:
+      PORT: 8002
+    ports:
+      - "8002:8002"
+    command: ["uvicorn", "propensity_model.api:app", "--host", "0.0.0.0", "--port", "8002"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  rag-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["prod"]
+    container_name: loyaltylens-rag-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      weaviate:
+        condition: service_healthy
+    env_file: ../.env
+    environment:
+      POSTGRES_URL: postgresql://loyaltylens:loyaltylens@postgres:5432/loyaltylens
+      WEAVIATE_URL: http://weaviate:8080
+      PORT: 8003
+    ports:
+      - "8003:8003"
+    command: ["uvicorn", "rag_retrieval.api:app", "--host", "0.0.0.0", "--port", "8003"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  llm-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["prod"]
+    container_name: loyaltylens-llm-api
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      PORT: 8004
+    ports:
+      - "8004:8004"
+    volumes:
+      # Share HuggingFace model cache across containers
+      - hf-cache:/root/.cache/huggingface
+    command: ["uvicorn", "llm_generator.api:app", "--host", "0.0.0.0", "--port", "8004"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s    # Extra time — HuggingFace model loading
+
+  feedback-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["prod"]
+    container_name: loyaltylens-feedback-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: ../.env
+    environment:
+      PORT: 8005
+    ports:
+      - "8005:8005"
+    volumes:
+      - feedback-data:/app/feedback_loop/data
+    command: ["uvicorn", "feedback_loop.api:app", "--host", "0.0.0.0", "--port", "8005"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Dashboard: MLflow tracking server
+  # ---------------------------------------------------------------------------
+  mlflow:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["dashboard", "prod"]
+    container_name: loyaltylens-mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlruns
+    command:
+      - mlflow
+      - server
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "5000"
+      - --backend-store-uri
+      - /mlruns
+      - --default-artifact-root
+      - /mlruns
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # Dashboard: Streamlit LLMOps dashboard
+  # ---------------------------------------------------------------------------
+  streamlit:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    profiles: ["dashboard", "prod"]
+    container_name: loyaltylens-streamlit
+    restart: unless-stopped
+    depends_on:
+      - mlflow
+    env_file: ../.env
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    ports:
+      - "8501:8501"
+    volumes:
+      - mlflow-data:/mlruns
+      - feedback-data:/app/feedback_loop/data
+    command:
+      - streamlit
+      - run
+      - llmops/dashboard/app.py
+      - --server.port=8501
+      - --server.address=0.0.0.0
+      - --server.headless=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ---------------------------------------------------------------------------
+# Named volumes — persist data across container restarts
+# ---------------------------------------------------------------------------
+volumes:
+  pgdata:
+    driver: local
+  weaviatedata:
+    driver: local
+  redisdata:
+    driver: local
+  uv-cache:
+    driver: local
+  hf-cache:
+    driver: local
+  mlflow-data:
+    driver: local
+  feedback-data:
+    driver: local

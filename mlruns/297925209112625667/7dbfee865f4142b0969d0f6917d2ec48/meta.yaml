@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/297925209112625667/7dbfee865f4142b0969d0f6917d2ec48/artifacts
+end_time: 1776372899900
+entry_point_name: ''
+experiment_id: '297925209112625667'
+lifecycle_stage: active
+run_id: 7dbfee865f4142b0969d0f6917d2ec48
+run_name: propensity-tabtransformer-v1
+run_uuid: 7dbfee865f4142b0969d0f6917d2ec48
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776372893971
+status: 3
+tags: []
+user_id: pushp

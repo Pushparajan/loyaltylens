@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     )
     duckdb_path: str = Field(default="data/feature_store.duckdb", alias="DUCKDB_PATH")
 
+    # Propensity model serving
+    propensity_model_version: str = Field(default="1", alias="PROPENSITY_MODEL_VERSION")
+    propensity_models_dir: str = Field(default="models", alias="PROPENSITY_MODELS_DIR")
+
     # Pipeline tunables
     batch_size: int = Field(default=512, alias="BATCH_SIZE")
     eval_pass_threshold: float = Field(default=0.75, alias="EVAL_PASS_THRESHOLD")

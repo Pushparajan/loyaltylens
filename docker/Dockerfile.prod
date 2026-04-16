@@ -1,0 +1,80 @@
+# =============================================================================
+# LoyaltyLens — Production API Image
+# =============================================================================
+# Slim image for deploying individual module APIs.
+# Does NOT include: dev tools (ruff, mypy, pytest), Node.js, Claude Code,
+#                   Streamlit, or local HuggingFace model weights.
+#
+# Build:  docker build -f Dockerfile.prod -t loyaltylens-api .
+# Run:    docker run -p 8002:8002 --env-file .env loyaltylens-api
+#
+# Overrride the CMD to run a different module API:
+#   docker run -p 8003:8003 --env-file .env loyaltylens-api \
+#     uvicorn rag_retrieval.api:app --host 0.0.0.0 --port 8003
+# =============================================================================
+
+FROM ghcr.io/astral-sh/uv:latest AS uv-binary
+
+# ---------------------------------------------------------------------------
+# Build stage — install dependencies
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim-bookworm AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=uv-binary /uv /usr/local/bin/uv
+
+ENV UV_SYSTEM_PYTHON=1 \
+    UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_NO_CACHE=1
+
+WORKDIR /app
+COPY pyproject.toml uv.lock* ./
+
+# Install only production dependencies (no dev group)
+RUN uv sync --no-dev 2>/dev/null || uv sync --no-dev --no-lock-check
+
+# ---------------------------------------------------------------------------
+# Runtime stage — minimal final image
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim-bookworm AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+WORKDIR /app
+
+# Copy application source
+COPY . .
+
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    POSTGRES_URL=postgresql://loyaltylens:loyaltylens@postgres:5432/loyaltylens \
+    WEAVIATE_URL=http://weaviate:8080 \
+    REDIS_URL=redis://redis:6379
+
+# Healthcheck — override port per module
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8002}/health || exit 1
+
+EXPOSE 8002
+
+# Default: run the propensity model API
+# Override with: docker run ... loyaltylens-api uvicorn rag_retrieval.api:app ...
+CMD ["uvicorn", "propensity_model.api:app", "--host", "0.0.0.0", "--port", "8002"]

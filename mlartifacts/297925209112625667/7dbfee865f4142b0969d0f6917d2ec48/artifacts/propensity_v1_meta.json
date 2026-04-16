@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "trained_at": "2026-04-16T20:54:59.890983+00:00",
+  "val_auc": 1.0,
+  "feature_names": [
+    "recency_days",
+    "frequency_30d",
+    "monetary_90d",
+    "offer_redemption_rate",
+    "channel_preference",
+    "engagement_score"
+  ],
+  "threshold": 0.5
+}
