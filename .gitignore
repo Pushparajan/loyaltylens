@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Data — ignore generated files, keep directory structure
+data/raw/*.parquet
+data/processed/*.parquet
+data/*.duckdb
+
+# Env
+.env
+
+# Testing / coverage
+.coverage
+coverage.xml
+.pytest_cache/
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# IDEs
+.vscode/
+.idea/
