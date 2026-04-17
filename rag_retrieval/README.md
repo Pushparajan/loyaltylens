@@ -82,11 +82,11 @@ docker compose down -v
 From the **repo root** in PowerShell:
 
 ```powershell
-# Create a virtual environment in .venv/
+# Create the root venv (skip if it already exists)
 uv venv --python 3.11
 
-# Activate it
-.\.venv\Scripts\Activate.ps1
+# Activate — prompt changes to (loyaltylens)
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1
 
 # Install all dependencies (production + dev) from the lockfile
 uv sync --dev
@@ -189,8 +189,8 @@ python rag_retrieval/benchmark.py
 Ensure the **repo-root** venv is active (not a sub-module venv):
 
 ```powershell
-# From repo root — activate root venv if not already active
-.\.venv\Scripts\Activate.ps1
+# Activate repo-root venv — prompt must show (loyaltylens), not (.venv)
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1
 ```
 
 ```powershell

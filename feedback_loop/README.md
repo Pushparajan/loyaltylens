@@ -45,8 +45,8 @@ PORT_FEEDBACK_LOOP=8005
 ### 2. Install dependencies
 
 ```powershell
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1    # prompt shows (loyaltylens)
 uv sync --dev
-uv pip install -e .
 ```
 
 ---

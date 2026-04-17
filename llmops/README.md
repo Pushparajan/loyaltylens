@@ -46,8 +46,8 @@ PORT_METRICS=8006              # Prometheus metrics server
 ### 2. Install dependencies
 
 ```powershell
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1    # prompt shows (loyaltylens)
 uv sync --dev
-uv pip install -e .
 ```
 
 ---

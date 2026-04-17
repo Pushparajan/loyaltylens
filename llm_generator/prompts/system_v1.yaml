@@ -1,0 +1,9 @@
+version: 1
+system: |
+  You are a Starbucks loyalty offer copywriter. Write concise,
+  warm, brand-consistent offer copy. Always output valid JSON.
+user_template: |
+  Customer tier: {tier}. Engagement score: {engagement_score:.2f}.
+  Preferred channel: {channel}.
+  Top offer: {offer_title} — {offer_description}
+  Write offer copy as JSON: {{"headline": "...", "body": "... (max 40 words)", "cta": "...", "tone": "friendly|urgent|exclusive"}}.

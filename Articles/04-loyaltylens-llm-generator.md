@@ -1,7 +1,7 @@
 ---
 title: "Prompt Engineering Is Software Engineering: Versioning, Testing, and Multimodal Extension"
 slug: "loyaltylens-llm-generator"
-description: "Building the LLM offer copy generator — versioned YAML prompt registry, dual LLM backends, JSON parse retry logic, and a CLIP brand alignment scorer."
+description: "Building the LLM offer copy generator — versioned YAML prompt registry, dual LLM backends, JSON parse retry logic, and Flux AI brand image generation via HuggingFace."
 date: 2026-05-19
 author: Pushparajan Ramar
 series: loyaltylens
@@ -13,19 +13,20 @@ tags:
   - multimodal
   - generative-ai
   - huggingface
-  - clip
+  - flux-ai
+  - image-generation
 ---
 
 # Prompt Engineering Is Software Engineering: Versioning, Testing, and Multimodal Extension
 
-*Building the LLM offer copy generator and CLIP brand-image scorer — LoyaltyLens Module 4*
+## Building the LLM offer copy generator and Flux AI brand image generator — LoyaltyLens Module 4
 
 ---
 
 
 ---
 
-In 2023 I helped architect a global loyalty program's integration of a generative AI content platform into their content supply chain. The goal was to automate the generation of brand-consistent visual assets — the imagery that accompanies offer push notifications, email campaigns, and in-app banners. The platform is remarkable technology, but the hardest part of the project had nothing to do with generative AI.
+In 2023 I helped architect a global loyalty program's integration of a generative AI content platform into their content supply chain. The goal was to automate the generation of brand-consistent visual assets — the imagery that accompanies offer push notifications, email campaigns, and in-app banners. Flux AI is today's open-source answer to what those enterprise platforms provided, running free on HuggingFace's Inference API. But the hardest part of the project had nothing to do with which image model you use.
 
 The hardest part was treating prompts as production artifacts.
 
@@ -43,7 +44,7 @@ The end-to-end offer copy pipeline has three layers:
 2. **Copy generation** (this module): *What message* best presents that offer to this customer?
 3. **Brand alignment** (this module): Does the generated copy *look and feel* like an on-brand loyalty message?
 
-Most tutorials cover the middle layer only. The brand alignment layer — the CLIP-based image-text relevance scorer — is the generative image-text alignment scorer that makes this project meaningfully different from a generic LLM demo.
+Most tutorials cover the middle layer only. The brand alignment layer — Flux AI image generation from the offer copy itself — is what makes this project meaningfully different from a generic LLM demo.
 
 ---
 
@@ -237,70 +238,56 @@ The abstract base class is what makes this testable. In unit tests, I inject a `
 
 ---
 
-## The CLIP Brand Alignment Scorer
+## The Flux AI Brand Image Generator
 
-This is the component that most directly mirrors what we built in production with a generative AI content platform.
+This is the component that most directly mirrors what enterprise loyalty platforms do with generative visual AI — and it's available free via HuggingFace's Inference API.
 
-A generative AI content platform produces brand-consistent visual assets by conditioning on brand-specific training data. The alignment check — does this generated image actually match the brand? — is a multimodal similarity computation between the image and a text description of what an on-brand visual should look like.
-
-In LoyaltyLens I implement a simplified version: CLIP computes the cosine similarity between the embedding of a generated offer copy text and the embedding of a brand reference image:
+The idea is simple: once the LLM has produced the offer copy, use that copy as a text prompt to generate a matching campaign image. The `/generate` endpoint accepts an optional `generate_image: true` flag; when set, it feeds the headline and body into FLUX.1-schnell and saves the result alongside the copy.
 
 ```python
 # llm_generator/multimodal.py
-import torch
+from huggingface_hub import InferenceClient
 from PIL import Image
-from transformers import CLIPProcessor, CLIPModel
+from pathlib import Path
 
-class BrandImageScorer:
-    def __init__(self, model_id: str = "openai/clip-vit-base-patch32"):
-        self.model = CLIPModel.from_pretrained(model_id)
-        self.processor = CLIPProcessor.from_pretrained(model_id)
-        self.model.eval()
+class BrandImageGenerator:
+    """Generate brand images from offer copy using FLUX.1-schnell (free HF Inference API)."""
 
-    def score_relevance(self, image_path: str, copy_text: str) -> float:
-        """
-        Returns cosine similarity between image embedding and text embedding.
-        Higher = more aligned. Range: approximately [-1, 1], practically [0, 1].
-        """
-        image = Image.open(image_path).convert("RGB")
-        inputs = self.processor(
-            text=[copy_text],
-            images=image,
-            return_tensors="pt",
-            padding=True,
+    def __init__(self) -> None:
+        settings = get_settings()
+        self._client = InferenceClient(
+            model="black-forest-labs/FLUX.1-schnell",
+            token=settings.hf_token or None,  # optional — higher rate limits with token
         )
-        with torch.no_grad():
-            outputs = self.model(**inputs)
 
-        img_emb = outputs.image_embeds / outputs.image_embeds.norm(dim=-1, keepdim=True)
-        txt_emb = outputs.text_embeds / outputs.text_embeds.norm(dim=-1, keepdim=True)
-        similarity = (img_emb * txt_emb).sum(dim=-1).item()
+    def generate(self, copy_text: str) -> Image.Image:
+        return self._client.text_to_image(copy_text)
 
-        # Scale to [0, 1] for interpretability
-        return (similarity + 1) / 2
-
-    def batch_score(
-        self, image_paths: list[str], copy_texts: list[str]
-    ) -> list[float]:
-        scores = []
-        for img_path, text in zip(image_paths, copy_texts):
-            scores.append(self.score_relevance(img_path, text))
-        return scores
+    def generate_to_path(self, copy_text: str, output_path: str | Path) -> Path:
+        path = Path(output_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.generate(copy_text).save(path)
+        return path
 ```
 
-In practice, I load four brand reference images representing different loyalty brand visual contexts (in-store environment, product close-ups, seasonal decoration, app interface). The scorer returns a vector of four similarity scores — and a generated copy is flagged for human review if *any* score falls below 0.35.
+The model choice matters. FLUX.1-schnell is Black Forest Labs' fastest open model — four-step diffusion, no classifier-free guidance, runs in under two seconds on the HuggingFace serverless GPU tier. For brand asset generation at loyalty-programme scale, "fast and free during prototyping, swappable for a fine-tuned model in production" is exactly the right trade-off.
+
+The API wires it together. When `generate_image=true`, the endpoint concatenates headline and body into a single prompt, calls the generator, and returns the saved path:
 
 ```python
-# Usage in the generate endpoint
-brand_scores = scorer.batch_score(
-    image_paths=config.BRAND_REFERENCE_IMAGES,
-    copy_texts=[offer_copy.body],
-)
-min_brand_score = min(brand_scores)
-brand_aligned = min_brand_score >= config.BRAND_ALIGNMENT_THRESHOLD  # 0.35
+# llm_generator/api.py — relevant excerpt
+@app.post("/generate")
+async def generate(req: GenerateRequest) -> GenerateResponse:
+    copy = _get_generator(req.prompt_version).generate(customer_context, offer)
+    image_path = None
+    if req.generate_image:
+        gen = BrandImageGenerator()
+        prompt = f"{copy.headline}. {copy.body}"
+        image_path = str(gen.generate_to_path(prompt, BRAND_IMAGES_DIR / f"{req.offer_id}_generated.png"))
+    return GenerateResponse(..., generated_image_path=image_path)
 ```
 
-In production, this kind of automated brand alignment check runs before content enters the campaign execution system. It doesn't replace creative review — it prevents obviously off-brand content from ever reaching a reviewer's queue.
+In production you would replace the free Inference API with a fine-tuned Flux variant conditioned on brand-approved visual training data. The interface stays identical — swap the model ID and token. That's the point of the abstraction.
 
 ---
 
@@ -317,7 +304,7 @@ Here's what the full generation pipeline produces for a high-engagement mobile-f
   "model_version": "gpt-4o-mini",
   "prompt_version": 2,
   "latency_ms": 847.3,
-  "brand_image_score": 0.71
+  "generated_image_path": "data/brand_images/O042_generated.png"
 }
 ```
 

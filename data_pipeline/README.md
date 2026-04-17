@@ -65,10 +65,12 @@ docker compose ps
 Always use the **repo-root** `.venv` — sub-module venvs (`data_pipeline/.venv`, etc.) are legacy and should not be used.
 
 ```powershell
-# Windows (PowerShell) — run from c:\Projects\loyaltylens
-uv venv .venv --python 3.11
-.venv\Scripts\Activate.ps1
+# Windows (PowerShell) — from c:\Projects\loyaltylens
+uv venv .venv --python 3.11                              # skip if venv already exists
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1    # prompt shows (loyaltylens)
+```
 
+```bash
 # macOS / Linux
 uv venv .venv --python 3.11
 source .venv/bin/activate
@@ -85,7 +87,6 @@ Run from the **repo root** (`c:\Projects\loyaltylens`), not from inside `data_pi
 
 ```powershell
 uv sync --dev
-uv pip install -e .      # makes shared/ importable without PYTHONPATH
 ```
 
 ---

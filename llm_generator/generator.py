@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+import json
+import re
 import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 from uuid import UUID
 
+import yaml
 from openai import OpenAI
 
+from llm_generator.backends import LLMBackend
 from llm_generator.prompt_builder import PromptBuilder
 from llm_generator.response_parser import OfferResponse, ResponseParser
 from shared.config import get_settings
@@ -14,6 +21,103 @@ from shared.logger import get_logger
 from shared.schemas import CustomerProfile, FeatureVector, LLMResponse
 
 logger = get_logger(__name__)
+
+# ── OfferCopy dataclass + OfferCopyGenerator ──────────────────────────────────
+
+_PROMPTS_DIR = Path(__file__).parent / "prompts"
+_VAR_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)(?::([^}]*))?\}")
+
+
+@dataclass
+class OfferCopy:
+    headline: str
+    body: str
+    cta: str
+    tone: str
+    model_version: str
+    prompt_version: int
+    latency_ms: float
+    token_count: int
+
+
+def _load_prompt(version: int) -> dict[str, str]:
+    path = _PROMPTS_DIR / f"system_v{version}.yaml"
+    with path.open(encoding="utf-8") as fh:
+        return yaml.safe_load(fh)  # type: ignore[no-any-return]
+
+
+def _render(template: str, context: dict[str, Any]) -> str:
+    """Substitute only known {key} and {key:fmt} placeholders; leave others untouched."""
+
+    def replacer(m: re.Match) -> str:
+        key, spec = m.group(1), m.group(2) or ""
+        if key not in context:
+            return m.group(0)
+        return format(context[key], spec) if spec else str(context[key])
+
+    return _VAR_RE.sub(replacer, template)
+
+
+def _parse_copy_json(raw: str) -> dict[str, Any]:
+    start, end = raw.find("{"), raw.rfind("}") + 1
+    if start == -1 or end == 0:
+        raise ValueError(f"No JSON object found in LLM response: {raw!r}")
+    payload: dict[str, Any] = json.loads(raw[start:end])
+    missing = {"headline", "body", "cta", "tone"} - payload.keys()
+    if missing:
+        raise ValueError(f"LLM response missing fields: {missing}")
+    return payload
+
+
+class OfferCopyGenerator:
+    """Generate brand-consistent Starbucks offer copy via a pluggable LLM backend."""
+
+    def __init__(self, backend: LLMBackend, prompt_version: int = 1) -> None:
+        self._backend = backend
+        self._prompt_version = prompt_version
+        self._prompt = _load_prompt(prompt_version)
+
+    def generate(
+        self,
+        customer_context: dict[str, Any],
+        offer: dict[str, Any],
+    ) -> OfferCopy:
+        """Render the prompt, call the backend, parse JSON; retry once on parse failure."""
+        context = {**customer_context, **offer}
+        user_msg = _render(self._prompt["user_template"], context).strip()
+        messages = [
+            {"role": "system", "content": self._prompt["system"].strip()},
+            {"role": "user", "content": user_msg},
+        ]
+
+        t0 = time.monotonic()
+        raw = self._backend.generate(messages)
+        latency_ms = (time.monotonic() - t0) * 1000
+
+        try:
+            data = _parse_copy_json(raw)
+        except ValueError:
+            logger.warning("offer_copy_parse_retry", prompt_version=self._prompt_version)
+            raw = self._backend.generate(messages)
+            data = _parse_copy_json(raw)
+
+        copy = OfferCopy(
+            headline=data["headline"],
+            body=data["body"],
+            cta=data["cta"],
+            tone=data["tone"],
+            model_version=self._backend.model_name,
+            prompt_version=self._prompt_version,
+            latency_ms=round(latency_ms, 1),
+            token_count=len(raw.split()),
+        )
+        logger.info(
+            "offer_copy_generated",
+            model=self._backend.model_name,
+            prompt_version=self._prompt_version,
+            latency_ms=copy.latency_ms,
+        )
+        return copy
 
 _DEFAULT_MODEL = "gpt-4o-mini"
 

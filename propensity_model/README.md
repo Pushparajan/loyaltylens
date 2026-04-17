@@ -63,13 +63,8 @@ Always use the **repo-root** `.venv`. Sub-module venvs (`propensity_model/.venv`
 
 ```powershell
 # Windows (PowerShell) — from c:\Projects\loyaltylens
-uv venv .venv --python 3.11
-.venv\Scripts\Activate.ps1
-
-# Verify you are using the root venv
-python -c "import sys; print(sys.executable)"
-# Must show: C:\Projects\loyaltylens\.venv\Scripts\python.exe
-# If it shows propensity_model\.venv\..., run deactivate then re-activate above.
+uv venv .venv --python 3.11                              # skip if venv already exists
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1    # prompt shows (loyaltylens)
 ```
 
 ```bash
@@ -84,7 +79,6 @@ source .venv/bin/activate
 
 ```powershell
 uv sync --dev
-uv pip install -e .    # makes shared/ importable without PYTHONPATH
 ```
 
 CPU-only PyTorch (smaller download):
@@ -265,5 +259,5 @@ python -m propensity_model.inspect_model --version 2
 | `FileNotFoundError: models/propensity_v1.pt` | Model not trained | Run `python -m propensity_model.train` |
 | `503 Model not loaded` from API | Model file missing | Check `PROPENSITY_MODEL_VERSION` in root `.env` |
 | `MlflowException: connection refused` | MLflow not running | Run `python -m mlflow ui --port 5000` |
-| `No module named 'shared'` | Project not installed as editable | Run `uv pip install -e .` from repo root |
+| `No module named 'shared'` | Wrong venv active | Run `& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1` then `uv sync --dev` |
 | Low val AUC (< 0.60) | Class imbalance | Adjust `label_threshold` in `TabTransformerConfig` |
