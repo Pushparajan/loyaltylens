@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(.venv/Scripts/python.exe -c ' *)",
-      "Bash(.venv/Scripts/python.exe -m uvicorn --help)"
+      "Bash(.venv/Scripts/python.exe -m uvicorn --help)",
+      "Bash(git filter-repo *)",
+      "Bash(git filter-branch --force --tree-filter ' *)",
+      "Bash(git rebase *)",
+      "Bash(git push *)"
     ]
   }
 }
