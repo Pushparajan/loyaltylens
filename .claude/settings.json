@@ -28,7 +28,8 @@
       "Bash(VIRTUAL_ENV=/c/Projects/loyaltylens/.venv /c/Users/pushp/.local/bin/uv pip install redis sqlalchemy psycopg2-binary pandas numpy scikit-learn)",
       "Bash(VIRTUAL_ENV=/c/Projects/loyaltylens/.venv /c/Users/pushp/.local/bin/uv pip install uvicorn prefect weaviate-client)",
       "Bash(VIRTUAL_ENV=/c/Projects/loyaltylens/.venv /c/Users/pushp/.local/bin/uv pip install torch sentence-transformers langchain langchain-community psycopg2-binary duckdb mlflow xgboost pyarrow)",
-      "Bash(/c/Projects/loyaltylens/.venv/Scripts/python.exe -c \"import uvicorn, prefect, weaviate, torch, langchain, mlflow; print\\('all ok'\\)\")"
+      "Bash(/c/Projects/loyaltylens/.venv/Scripts/python.exe -c \"import uvicorn, prefect, weaviate, torch, langchain, mlflow; print\\('all ok'\\)\")",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_feedback.py -v --tb=short --no-cov)"
     ]
   }
 }

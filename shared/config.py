@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     hf_token: str = Field(default="", alias="HF_TOKEN")
     sagemaker_endpoint: str = Field(default="", alias="SAGEMAKER_ENDPOINT")
 
+    # ── GitHub Actions (RetrainingTrigger workflow_dispatch) ─────────────────
+    # In CI: injected automatically via secrets.GITHUB_TOKEN + github.repository.
+    # Locally: set GITHUB_TOKEN and GITHUB_REPO in root .env to enable dispatch.
+    github_token: str = Field(default="", alias="GITHUB_TOKEN")
+    github_repo: str = Field(default="", alias="GITHUB_REPO")
+
     # ── Infrastructure ports (override via env var to avoid touching URLs) ──
     postgres_port: int = Field(default=5432, alias="POSTGRES_PORT")
     weaviate_http_port: int = Field(default=8080, alias="WEAVIATE_HTTP_PORT")
@@ -37,7 +43,7 @@ class Settings(BaseSettings):
 
     # ── Data store URLs (include port; kept as full URLs for driver compat) ─
     postgres_url: str = Field(
-        default="postgresql://loyaltylens:loyaltylens@localhost:5432/loyaltylens",
+        default="postgresql://loyaltylens:changeme@localhost:5432/loyaltylens",
         alias="POSTGRES_URL",
     )
     weaviate_url: str = Field(default="http://localhost:8080", alias="WEAVIATE_URL")
