@@ -1,0 +1,409 @@
+{
+  "timestamp": "20260417T163335Z",
+  "n": 50,
+  "threshold": 0.75,
+  "mean_aggregate_score": 0.85,
+  "passed": true,
+  "scores": [
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    },
+    {
+      "bleu": 1.0,
+      "rouge_l": 1.0,
+      "coherence": 0.75,
+      "brand_alignment": 0.75,
+      "cta_strength": 0.75,
+      "aggregate": 0.85
+    }
+  ]
+}

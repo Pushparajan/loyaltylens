@@ -47,16 +47,15 @@ All ports are defined once in `shared/config.py` and read from the root `.env`. 
 git clone <repo-url>
 cd loyaltylens
 
-# Create root venv (canonical — all modules use this one)
+# Create root venv (canonical — all modules use this one; skip if it already exists)
 uv venv .venv --python 3.11
-.venv\Scripts\Activate.ps1          # Windows
-# source .venv/bin/activate         # macOS / Linux
 
-# Install all dependencies
+# Activate — prompt will show (loyaltylens)
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1    # Windows
+# source .venv/bin/activate                              # macOS / Linux
+
+# Install all dependencies (shared/ installed as editable via hatchling)
 uv sync --dev
-
-# Install project as editable (makes shared/ importable without PYTHONPATH)
-uv pip install -e .
 ```
 
 > **Windows execution policy:** If Activate.ps1 is blocked, run once:

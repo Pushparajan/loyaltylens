@@ -1,0 +1,18 @@
+[
+  {
+    "version": "v1",
+    "activated_at": "2026-04-01T09:00:00Z",
+    "previous": null
+  },
+  {
+    "version": "v2",
+    "activated_at": "2026-04-10T14:30:00Z",
+    "previous": "v1"
+  },
+  {
+    "version": "v1",
+    "activated_at": "2026-04-17T16:32:51Z",
+    "previous": "v2",
+    "note": "rollback"
+  }
+]

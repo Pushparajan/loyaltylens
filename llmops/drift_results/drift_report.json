@@ -1,0 +1,13 @@
+{
+  "psi": 0.0054,
+  "status": "ok",
+  "baseline_date": "2026-03-18",
+  "current_date": "2026-04-17",
+  "n_baseline": 5000,
+  "n_current": 1000,
+  "feature_breakdown": {},
+  "thresholds": {
+    "warning": 0.1,
+    "critical": 0.2
+  }
+}

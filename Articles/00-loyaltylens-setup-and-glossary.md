@@ -107,9 +107,11 @@ Activate the virtual environment:
 ```bash
 # macOS / Linux
 source .venv/bin/activate
+```
 
-# Windows (PowerShell) — use Activate.ps1, not activate.bat
-.venv\Scripts\Activate.ps1
+```powershell
+# Windows (PowerShell) — use absolute path; prompt will show (loyaltylens)
+& C:\Projects\loyaltylens\.venv\Scripts\Activate.ps1
 ```
 
 > **Windows execution policy:** If PowerShell blocks the activation script, run this once:
@@ -131,19 +133,14 @@ uv add langchain
 uv remove somepackage
 ```
 
-> **One venv to rule them all.** The repo root `.venv/` is the single canonical virtual environment. Sub-module folders (`data_pipeline/`, `propensity_model/`) may have their own `.venv/` from earlier experimentation — ignore them. Always install into and run from the root `.venv`. When installing packages explicitly, target it directly:
->
-> ```powershell
-> # Windows — always target the root .venv
-> uv pip install --python .venv\Scripts\python.exe <package>
-> ```
+> **One venv to rule them all.** The repo root `.venv/` is the single canonical virtual environment. Sub-module folders (`data_pipeline/`, `propensity_model/`) may have their own `.venv/` from earlier experimentation — ignore them. Always activate the root venv and use `uv sync --dev` or `uv add <package>` to manage dependencies.
 
 #### Install dev tools
 
-`pytest`, `ruff`, and `mypy` are listed under `[tool.poetry.group.dev.dependencies]`. `uv sync --dev` installs them automatically. If you need to add them manually:
+`pytest`, `ruff`, and `mypy` are listed under `[dependency-groups] dev` in `pyproject.toml`. `uv sync --dev` installs them automatically. To add a new dev dependency:
 
 ```bash
-uv pip install pytest pytest-asyncio pytest-cov ruff mypy
+uv add --dev pytest-xdist   # example
 ```
 
 #### Running tests

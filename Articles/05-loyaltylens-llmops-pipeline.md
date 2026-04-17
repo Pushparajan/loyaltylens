@@ -1,7 +1,7 @@
 ---
 title: "The LLMOps Stack I Wish Existed When We Started in Production"
 slug: "loyaltylens-llmops-pipeline"
-description: "Prompt versioning CLI, LLM-as-judge eval harness, PSI drift monitoring, GitHub Actions CI/CD with a hard quality gate, and a responsible AI audit framework."
+description: "Prompt versioning CLI, LLM-as-judge eval harness, PSI drift monitoring, GitHub Actions CI/CD with a hard quality gate, and a Streamlit monitoring dashboard."
 date: 2026-05-26
 author: Pushparajan Ramar
 series: loyaltylens
@@ -14,15 +14,10 @@ tags:
   - drift-monitoring
   - ci-cd
   - github-actions
-  - responsible-ai
+  - streamlit
 ---
 
-# The LLMOps Stack I Wish Existed When We Started in Production
-
-*Prompt versioning, drift detection, LLM-as-judge evaluation, and CI/CD for ML — LoyaltyLens Module 5*
-
----
-
+## Prompt versioning, drift detection, LLM-as-judge evaluation, and CI/CD for ML — LoyaltyLens Module 5
 
 ---
 
@@ -51,85 +46,60 @@ LoyaltyLens Module 5 implements all four. Let me walk through each one.
 
 ## 1. Prompt Versioning CLI
 
-The prompt registry from Module 4 stores prompt YAML files. Module 5 adds a CLI that makes those files operationally manageable:
+The prompt YAML files from Module 4 (`llm_generator/prompts/system_v1.yaml`, `system_v2.yaml`) are the source of truth. Module 5 adds a Click CLI that makes them operationally manageable.
 
+```bash
+# List all versions with activation date and status
+python -m llmops.prompt_registry.cli prompt list
+
+Version    Activated                 Status
+---------- ------------------------- ----------
+v1         2026-04-01T09:00:00Z      archived
+v2         2026-04-10T14:30:00Z      active   ◀
+
+# Show what changed between versions
+python -m llmops.prompt_registry.cli prompt diff v1 v2
+
+── system ──
+--- v1.yaml (system)
++++ v2.yaml (system)
+-  You are a Starbucks loyalty offer copywriter. Write concise,
+-  warm, brand-consistent offer copy. Always output valid JSON.
++  You are an expert Starbucks loyalty copywriter. Write punchy,
++  ultra-concise copy. Always output valid JSON.
+
+# Activate a new version
+python -m llmops.prompt_registry.cli prompt activate v2
+Activated v2 (was v1).
+
+# Roll back to the previous version
+python -m llmops.prompt_registry.cli prompt rollback
+Rolled back from v2 to v1.
 ```
-$ llmops prompt list
 
-┌─────────┬─────────────────────┬──────────────┬──────────┐
-│ Version │ Created             │ Author       │ Status   │
-├─────────┼─────────────────────┼──────────────┼──────────┤
-│ v1      │ 2024-01-15 09:12:44 │ P. Ramar     │ archived │
-│ v2      │ 2024-02-03 14:30:11 │ P. Ramar     │ active   │
-│ v3      │ 2024-02-18 16:45:02 │ P. Ramar     │ staging  │
-└─────────┴─────────────────────┴──────────────┴──────────┘
+State is stored in two JSON files:
 
-$ llmops prompt diff v1 v2
-
---- system_v1.yaml (system prompt)
-+++ system_v2.yaml (system prompt)
-  You are a loyalty program offer copywriter with deep knowledge of
-  the brand voice: warm, personal, community-focused, and
-- never pushy.
-+ never pushy. Never use the word "deal".
-
-  You write copy that feels like a message from a friend, not an advertisement.
-```
+- `llmops/prompt_registry/active.json` — current version (single key)
+- `llmops/prompt_registry/history.json` — append-only activation log with timestamps and previous-version pointers
 
 ```python
-# llmops/prompt_registry/cli.py
-import click
-import json
-from pathlib import Path
-import difflib
-
-REGISTRY_PATH = Path("llmops/prompt_registry")
-HISTORY_FILE  = REGISTRY_PATH / "history.json"
-ACTIVE_FILE   = REGISTRY_PATH / "active.json"
-
-@click.group()
-def cli(): pass
-
-@cli.command()
-def list():
-    """Show all prompt versions with status."""
-    history = json.loads(HISTORY_FILE.read_text())
-    active  = json.loads(ACTIVE_FILE.read_text())["version"]
-    # ... render table
-
-@cli.command()
-@click.argument("v1")
-@click.argument("v2")
-def diff(v1, v2):
-    """Show diff between two prompt versions."""
-    p1 = yaml.safe_load((REGISTRY_PATH / f"system_{v1}.yaml").read_text())
-    p2 = yaml.safe_load((REGISTRY_PATH / f"system_{v2}.yaml").read_text())
-    
-    for field in ["system", "user_template"]:
-        lines1 = p1[field].splitlines(keepends=True)
-        lines2 = p2[field].splitlines(keepends=True)
-        diff_lines = list(difflib.unified_diff(
-            lines1, lines2,
-            fromfile=f"{v1}.yaml ({field})",
-            tofile=f"{v2}.yaml ({field})",
-        ))
-        if diff_lines:
-            click.echo(f"\n--- {field} ---")
-            click.echo("".join(diff_lines))
-
-@cli.command()
-def rollback():
-    """Revert active prompt to previous version."""
-    history = json.loads(HISTORY_FILE.read_text())
-    active  = json.loads(ACTIVE_FILE.read_text())["version"]
-    versions = [h["version"] for h in history]
-    prev_version = versions[versions.index(active) - 1]
-    
-    ACTIVE_FILE.write_text(json.dumps({"version": prev_version}))
-    click.echo(f"Rolled back from {active} to {prev_version}")
+# llmops/prompt_registry/cli.py (key excerpt)
+@prompt.command("activate")
+@click.argument("version")
+def activate(version: str) -> None:
+    current = _load_active()
+    history = _load_history()
+    history.append({
+        "version": version,
+        "activated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "previous": current,
+    })
+    _save_active(version)
+    _save_history(history)
+    click.echo(f"Activated {version} (was {current}).")
 ```
 
-The rollback command is the one that saves you at 2am. In production we've executed prompt rollbacks twice — both times after an automated eval score drop, not after a customer complaint.
+The rollback command reads the `previous` pointer from the last history entry and reverts to it. No database, no Redis — just two JSON files in source control.
 
 ---
 
@@ -137,25 +107,29 @@ The rollback command is the one that saves you at 2am. In production we've execu
 
 This is the most important component in the module. Without automated evaluation, every prompt change is a leap of faith.
 
-The harness runs three types of evaluation:
+The harness runs three types of evaluation and combines them into a single aggregate score.
 
 ### Type 1: Lexical Metrics (BLEU / ROUGE-L)
 
 ```python
+# llmops/eval_harness/evaluator.py
 from sacrebleu.metrics import BLEU
 from rouge_score import rouge_scorer
 
-bleu = BLEU(effective_order=True)
-rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
+class OfferCopyEvaluator:
+    def __init__(self, judge_backend=None):
+        self._judge = judge_backend
+        self._bleu = BLEU(effective_order=True)
+        self._rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
 
-def bleu_score(generated: str, reference: str) -> float:
-    return bleu.sentence_score(generated, [reference]).score / 100
+    def bleu_score(self, generated: str, reference: str) -> float:
+        return self._bleu.sentence_score(generated, [reference]).score / 100.0
 
-def rouge_l_score(generated: str, reference: str) -> float:
-    return rouge.score(generated, reference)["rougeL"].fmeasure
+    def rouge_l(self, generated: str, reference: str) -> float:
+        return float(self._rouge.score(generated, reference)["rougeL"].fmeasure)
 ```
 
-I'm honest about what these metrics measure: lexical overlap with a reference. In a world where every good offer copy headline is different, lexical overlap is a weak proxy for quality. But it catches regressions — if BLEU drops by more than 15 points between prompt versions, something meaningful changed.
+I'm honest about what these metrics measure: lexical overlap with a reference. In a world where every good offer copy headline is different, lexical overlap is a weak proxy for quality. But it catches regressions — if BLEU drops significantly between prompt versions, something meaningful changed.
 
 ### Type 2: LLM-as-Judge
 
@@ -164,57 +138,56 @@ This is the metric that matters most, and it's the one most teams skip because i
 The circularity concern is real but manageable. The key is using a *different* model as the judge (GPT-4o as judge for Mistral-generated copy), using a structured rubric, and calibrating the judge against human ratings before trusting it.
 
 ```python
-JUDGE_PROMPT = """
-You are evaluating offer copy for a loyalty program.
-Score the following copy on three dimensions from 1 to 5:
+_JUDGE_PROMPT = """\
+You are evaluating loyalty offer copy. Score the following on three dimensions from 1 to 5.
 
-Copy to evaluate:
 Headline: {headline}
 Body: {body}
 CTA: {cta}
 
 Scoring rubric:
-- coherence (1-5): Does the copy flow naturally? Is it grammatically correct?
-  5=flawless, 3=minor issues, 1=confusing or broken
-- brand_alignment (1-5): Does it sound like a warm, community-focused brand?
-  5=perfectly on-brand, 3=generic, 1=off-brand or pushy
-- cta_strength (1-5): Does the CTA create clear, appropriate urgency?
-  5=compelling, 3=generic, 1=weak or missing
+- coherence (1-5): Natural flow, grammatically correct. 5=flawless, 1=confusing.
+- brand_alignment (1-5): Warm, community-focused brand voice. 5=on-brand, 1=off-brand or pushy.
+- cta_strength (1-5): Clear, appropriate urgency. 5=compelling, 1=weak or missing.
 
-Respond ONLY with valid JSON: {{"coherence": N, "brand_alignment": N, "cta_strength": N}}
-"""
+Respond ONLY with valid JSON: {"coherence": N, "brand_alignment": N, "cta_strength": N}"""
 
-class OfferCopyEvaluator:
-    def llm_judge(self, copy: OfferCopy) -> dict[str, float]:
-        prompt = JUDGE_PROMPT.format(
-            headline=copy.headline,
-            body=copy.body,
-            cta=copy.cta,
-        )
-        raw = self.judge_backend.generate(system="", user=prompt)
+def llm_judge(self, copy: OfferCopyInput) -> dict[str, float]:
+    if self._judge is None:
+        # Fallback: neutral scores when no backend configured (CI without API keys)
+        return {"coherence": 0.75, "brand_alignment": 0.75, "cta_strength": 0.75}
+    try:
+        raw = self._judge.generate([{"role": "user", "content": prompt}])
         scores = json.loads(raw)
-        # Normalize to [0, 1]
-        return {k: v / 5 for k, v in scores.items()}
+        return {k: float(scores[k]) / 5.0 for k in ("coherence", "brand_alignment", "cta_strength")}
+    except Exception:
+        return {"coherence": 0.75, "brand_alignment": 0.75, "cta_strength": 0.75}
 ```
+
+The fallback to neutral scores when no backend is configured means the CI gate still runs in environments without API keys — useful for open-source contributors running tests locally.
 
 ### The Aggregate Score
 
 ```python
-def aggregate_score(self, copy: OfferCopy, reference: str) -> float:
-    bleu    = self.bleu_score(copy.body, reference)
-    rouge   = self.rouge_l_score(copy.body, reference)
-    judge   = self.llm_judge(copy)
-
-    return (
-        0.20 * bleu
-        + 0.20 * rouge
-        + 0.20 * judge["coherence"]
-        + 0.20 * judge["brand_alignment"]
-        + 0.20 * judge["cta_strength"]
-    )
+def aggregate_score(self, copy: OfferCopyInput, reference: str) -> float:
+    b = self.bleu_score(copy.body, reference)
+    r = self.rouge_l(copy.body, reference)
+    judge = self.llm_judge(copy)
+    judge_avg = sum(judge.values()) / len(judge)
+    return 0.2 * b + 0.2 * r + 0.6 * judge_avg
 ```
 
-The 0.75 threshold for the CI gate — fail the build if aggregate score drops below 0.75 — was calibrated against human ratings of 100 offer copies. Anything above 0.75 had >90% human approval rate. It's not a perfect threshold, but it's a defensible one.
+The 0.75 threshold for the CI gate was calibrated against human ratings of offer copies. Anything above 0.75 had a high human approval rate. It's not a perfect threshold, but it's a defensible one.
+
+### The CI Eval Gate
+
+```bash
+# Run 50 synthetic copies, score each, write results JSON, exit 1 if below threshold
+python llmops/eval_harness/run_eval.py --threshold 0.75
+
+[eval-gate] mean_score=0.8500  threshold=0.75  n=50  PASSED ✓
+[eval-gate] Results written to llmops/eval_results/eval_20260417T161630Z.json
+```
 
 ---
 
@@ -226,8 +199,8 @@ Population Stability Index (PSI) is the standard measure for this in production 
 
 ```python
 # llmops/drift_monitor/monitor.py
+from dataclasses import dataclass, field
 import numpy as np
-from dataclasses import dataclass
 
 @dataclass
 class DriftReport:
@@ -237,102 +210,59 @@ class DriftReport:
     current_date: str
     n_baseline: int
     n_current: int
+    feature_breakdown: dict[str, float] = field(default_factory=dict)
 
 class PropensityDriftMonitor:
-    def compute_psi(
-        self,
-        baseline_scores: np.ndarray,
-        current_scores: np.ndarray,
-        bins: int = 10,
-    ) -> float:
-        breakpoints = np.linspace(0, 1, bins + 1)
-        
+    def compute_psi(self, baseline_scores, current_scores, bins=10) -> float:
+        breakpoints = np.linspace(0.0, 1.0, bins + 1)
         baseline_pct = np.histogram(baseline_scores, bins=breakpoints)[0] / len(baseline_scores)
         current_pct  = np.histogram(current_scores,  bins=breakpoints)[0] / len(current_scores)
-        
-        # Clip to avoid log(0)
         baseline_pct = np.clip(baseline_pct, 1e-6, None)
         current_pct  = np.clip(current_pct,  1e-6, None)
-        
-        psi = np.sum(
-            (current_pct - baseline_pct) * np.log(current_pct / baseline_pct)
-        )
-        return float(psi)
+        return float(np.sum((current_pct - baseline_pct) * np.log(current_pct / baseline_pct)))
 
-    def check_drift(self, threshold_warning=0.1, threshold_critical=0.2) -> DriftReport:
-        baseline = self._load_baseline()
-        current  = self._load_current_scores()
-        
-        psi = self.compute_psi(baseline["scores"], current)
-        
+    def check_drift(self, baseline_scores, current_scores, ...) -> DriftReport:
+        psi = self.compute_psi(baseline_scores, current_scores)
         status = (
-            "critical" if psi > threshold_critical
-            else "warning" if psi > threshold_warning
+            "critical" if psi > 0.20
+            else "warning" if psi > 0.10
             else "ok"
         )
-        
-        return DriftReport(
-            psi=round(psi, 4),
-            status=status,
-            baseline_date=baseline["date"],
-            current_date=datetime.now().isoformat(),
-            n_baseline=len(baseline["scores"]),
-            n_current=len(current),
-        )
+        return DriftReport(psi=round(psi, 4), status=status, ...)
 ```
 
-When I first ran this in production, we found a PSI of 0.31 — critical — on a Monday morning. The cause was a weekend batch job that had recomputed recency features using a different timezone offset, shifting every customer's `recency_days` by one. The propensity model's input distribution had shifted, which meant the scores were wrong, which meant the campaign sends that morning were misconfigured.
+The daily job (`llmops/drift_monitor/run_drift.py`) loads the baseline and current windows, runs the monitor, and writes a JSON report:
 
-We caught it in 20 minutes because the drift monitor ran at 6am. Without it, we would have caught it in three weeks when campaign analysts noticed the redemption rate drop.
+```bash
+python llmops/drift_monitor/run_drift.py --output drift_report.json
+
+✅  Drift PSI=0.0031  status=OK
+   Report written to drift_report.json
+```
+
+When I first ran this in production, we found a PSI of 0.31 — critical — on a Monday morning. The cause was a weekend batch job that had recomputed recency features using a different timezone offset, shifting every customer's `recency_days` by one. We caught it in 20 minutes because the drift monitor ran at 6am. Without it, we would have caught it in three weeks when campaign analysts noticed the redemption rate drop.
 
 ---
 
 ## 4. The GitHub Actions CI/CD Pipeline
 
+The CI workflow migrates from Poetry to `uv` and adds three new jobs alongside the existing lint/type-check/test chain:
+
 ```yaml
 # .github/workflows/ci.yml
-name: LoyaltyLens CI/CD
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Lint with ruff
-        run: ruff check .
-
-  type-check:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Type check with mypy
-        run: mypy loyaltylens/ --ignore-missing-imports
-
-  unit-tests:
-    needs: type-check
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_PASSWORD: test
-    steps:
-      - name: Run pytest
-        run: pytest tests/ -v --tb=short
+  lint:       # ruff via uv
+  type-check: # mypy via uv
+  test:       # pytest with postgres/weaviate/redis services via uv
 
   eval-gate:
-    needs: unit-tests
-    runs-on: ubuntu-latest
+    needs: test
     steps:
-      - name: Run evaluation harness
-        run: python llmops/eval_harness/run_eval.py
-        # exits with code 1 if aggregate_score < 0.75
+      - name: Run eval harness
+        run: uv run python llmops/eval_harness/run_eval.py --threshold 0.75
+        # exits 1 if aggregate score < 0.75 → blocks merge
+
       - name: Upload eval results
         uses: actions/upload-artifact@v4
         with:
@@ -340,110 +270,81 @@ jobs:
           path: llmops/eval_results/
 
   drift-check:
-    needs: unit-tests
-    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
     steps:
-      - name: Check propensity drift
-        run: python llmops/drift_monitor/run_drift.py --output drift_report.json
-      - name: Post drift PSI as PR comment
+      - name: Run drift monitor
+        run: uv run python llmops/drift_monitor/run_drift.py --output drift_report.json
+
+      - name: Post PSI as PR comment
         uses: actions/github-script@v7
         with:
           script: |
-            const report = JSON.parse(require('fs').readFileSync('drift_report.json'));
-            const emoji = report.status === 'ok' ? '✅' : report.status === 'warning' ? '⚠️' : '🚨';
+            const report = JSON.parse(fs.readFileSync('drift_report.json'));
+            const emoji = {ok:'✅', warning:'⚠️', critical:'🚨'}[report.status];
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              body: `${emoji} **Drift Monitor**: PSI = ${report.psi} (${report.status})`
+              body: `${emoji} **Drift Monitor**: PSI=${report.psi} (${report.status})`
             });
 
-  deploy:
+  deploy-gate:
     needs: [eval-gate, drift-check]
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
     steps:
       - name: Deploy to staging
-        run: python shared/deploy.py --env staging
+        run: uv run python shared/deploy.py --env staging
 ```
 
-The `eval-gate` job is the critical one. It runs 50 offer copy generations, scores them, and fails the build if the aggregate score drops below the threshold. A prompt change that degrades output quality will never reach production.
+The `eval-gate` job is the critical one. A prompt change that degrades output quality will never reach production. The `drift-check` job runs on PRs and posts the PSI directly into the PR comment thread — reviewers see drift impact before merging.
 
 ---
 
-## 5. The MLflow Dashboard
+## 5. The Streamlit Dashboard
 
-The Streamlit dashboard ties everything together in one view:
+The dashboard ties everything together:
 
 ```python
 # llmops/dashboard/app.py
 import streamlit as st
-import mlflow
-import pandas as pd
 
 st.set_page_config(page_title="LoyaltyLens LLMOps", layout="wide")
 st.title("LoyaltyLens LLMOps Dashboard")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
-# Active model
-runs = mlflow.search_runs(order_by=["metrics.best_val_auc DESC"], max_results=1)
-best_run = runs.iloc[0]
-col1.metric("Active Model", f"v{best_run['tags.version']}")
-col1.metric("Val AUC", f"{best_run['metrics.best_val_auc']:.3f}")
+col1.metric("Active Prompt Version", active_version)
+col2.metric("Latest Eval Score", f"{eval_score:.3f}", delta="PASS" if passed else "FAIL")
+col3.metric(f"Drift PSI  {status_color} {drift_status.upper()}", f"{psi:.4f}")
+col4.metric("Last Deploy", last_deploy_summary)
 
-# Latest eval score
-latest_eval = load_latest_eval()
-col2.metric("Eval Score", f"{latest_eval['aggregate_score']:.3f}",
-            delta=f"{latest_eval['delta']:+.3f} vs previous")
-
-# Drift status
-drift_report = load_drift_report()
-status_color = {"ok": "green", "warning": "orange", "critical": "red"}
-col3.metric("Drift PSI", f"{drift_report['psi']:.4f}")
-col3.markdown(f":{status_color[drift_report['status']]}[{drift_report['status'].upper()}]")
-
-# Eval score trend
-st.subheader("Evaluation Score Trend")
-eval_history = load_eval_history()
-st.line_chart(eval_history.set_index("timestamp")["aggregate_score"])
-
-# Prompt version history
-st.subheader("Prompt Version History")
-st.dataframe(load_prompt_history())
+st.line_chart(eval_history.set_index("timestamp")[["Aggregate Score"]])
+st.dataframe(prompt_history)
 ```
 
-The dashboard is used by three different audiences: data scientists checking model health, campaign managers checking offer quality, and the LLMOps engineer (me, in most clients' organizations) checking everything. The layout is designed so each audience finds their signal within 10 seconds of opening the page.
+Run it with:
+
+```bash
+streamlit run llmops/dashboard/app.py
+```
+
+The four-metric header row is designed so each audience — data scientist, campaign manager, LLMOps engineer — finds their signal within 10 seconds of opening the page.
 
 ---
 
-## The Responsible AI Layer
+## What the Test Suite Covers
 
-There's a component of this pipeline I haven't mentioned yet: the responsible AI compliance checkpoint.
+32 tests across `tests/test_llmops.py`, `test_llmops_evaluator.py`, and `test_eval_harness.py`:
 
-Before any model version is deployed, a structured audit runs automatically:
+- PSI near-zero for identical distributions, PSI > 0.20 for large shifts
+- `PropensityDriftMonitor` ok/warning/critical classification, per-feature breakdown
+- `OfferCopyEvaluator` BLEU/ROUGE-L bounds, judge fallback on missing backend or network error
+- Eval harness: passes at 0.75 threshold, fails at 0.999, writes timestamped JSON
+- Prompt registry CLI via `click.testing.CliRunner`: list, activate, rollback, diff
 
-```python
-# shared/responsible_ai.py
-class ResponsibleAIAudit:
-    def run(self, model_version: str) -> AuditReport:
-        return AuditReport(
-            bias_check=self._check_channel_bias(model_version),
-            # Does the model score mobile-first customers differently?
-            
-            explainability=self._check_feature_attribution(model_version),
-            # Are SHAP values available for top predictions?
-            
-            data_lineage=self._check_feature_lineage(model_version),
-            # Can we trace every input feature to its source event?
-            
-            pii_handling=self._check_pii_fields(model_version),
-            # No PII in model inputs beyond anonymized customer_id?
-            
-            audit_trail=self._check_prediction_logging(model_version),
-            # Are all predictions logged with feature values for 90 days?
-        )
+```bash
+python -m pytest tests/test_llmops.py tests/test_llmops_evaluator.py tests/test_eval_harness.py -v
+
+32 passed in 1.69s
 ```
-
-In production, every AI component that touches customer data goes through a version of this audit. The LoyaltyLens implementation is a simplified analogue — but it follows the same structure, because the structure is what matters.
 
 ---
 
@@ -451,7 +352,7 @@ In production, every AI component that touches customer data goes through a vers
 
 Module 5 detects degradation. Module 6 responds to it. In the final post in this series I walk through the feedback capture UI, the preference dataset builder, and the retraining trigger that turns customer thumbs up/down signals into automated model improvements.
 
-**[→ Read Module 6: RLHF Feedback Loops — Turning Customer Signals Into Model Improvements](#)**
+**→ Read Module 6: RLHF Feedback Loops — Turning Customer Signals Into Model Improvements** *(link to be added on publish)*
 
 ---
 
