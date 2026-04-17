@@ -6,17 +6,17 @@
     {
       "retriever": "langchain",
       "runs": 10,
-      "latency_p50_ms": 65.18,
-      "latency_p95_ms": 68.02,
-      "latency_mean_ms": 64.99,
+      "latency_p50_ms": 62.55,
+      "latency_p95_ms": 64.92,
+      "latency_mean_ms": 63.02,
       "precision_at_5_mean": 0.7
     },
     {
       "retriever": "llamaindex",
       "runs": 10,
-      "latency_p50_ms": 22.45,
-      "latency_p95_ms": 33.28,
-      "latency_mean_ms": 24.27,
+      "latency_p50_ms": 18.43,
+      "latency_p95_ms": 20.92,
+      "latency_mean_ms": 18.33,
       "precision_at_5_mean": 0.9
     }
   ],

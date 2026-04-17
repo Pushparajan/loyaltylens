@@ -6,7 +6,9 @@
       "Bash(git filter-repo *)",
       "Bash(git filter-branch --force --tree-filter ' *)",
       "Bash(git rebase *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(pip list *)",
+      "Bash(/c/Projects/loyaltylens/.venv/Scripts/python.exe -m pytest tests/test_rag.py -v)"
     ]
   }
 }

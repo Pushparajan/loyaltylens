@@ -186,8 +186,15 @@ python rag_retrieval/benchmark.py
 
 ### 7 — Run tests
 
+Ensure the **repo-root** venv is active (not a sub-module venv):
+
 ```powershell
-# All RAG tests
+# From repo root — activate root venv if not already active
+.\.venv\Scripts\Activate.ps1
+```
+
+```powershell
+# All RAG tests (14 tests)
 python -m pytest tests/test_rag.py -v
 
 # With coverage
@@ -196,10 +203,10 @@ python -m pytest tests/test_rag.py -v --cov=rag_retrieval --cov-report=term-miss
 
 Tests cover:
 
-- Embedding shape (384-dim assertion)
-- pgvector round-trip (insert → query → verify)
-- Retrieval returns exactly `k` results
-- Propensity filter correctly excludes offers above threshold
+- Offer generation — 200 offers, correct schema fields and category values, propensity threshold range
+- Embedding shape — 384-dim, correct batch shape, L2-normalised vectors
+- pgvector round-trip — upsert → query → verify
+- LangChain retriever — returns exactly `k` results, propensity filter excludes offers above threshold, result fields present
 
 ---
 
