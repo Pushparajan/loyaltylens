@@ -1,8 +1,8 @@
 ---
-title: "RLHF Without a Research Team: Building Practical Feedback Loops for Production LLMs"
+title: "Building a Feedback Loop for Production LLMs: Signals, Preference Data, and Retraining Triggers"
 slug: "loyaltylens-rlhf-feedback-loop"
-description: "Closing the production AI loop — feedback capture API, React review UI, preference dataset export, automated retraining triggers, and the honest limits of practical RLHF."
-date: 2026-06-02
+description: "Closing the production AI loop — feedback capture API, React review UI, preference dataset export, automated retraining triggers, and the practical limits of RLHF without a research team."
+date: 2026-05-14
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 6
@@ -18,31 +18,33 @@ tags:
   - fastapi
 ---
 
-## Closing the loop with customer signals, preference datasets, and automated retraining — LoyaltyLens Module 6
+# Building a Feedback Loop for Production LLMs: Signals, Preference Data, and Retraining Triggers
+
+*Feedback capture API, React review UI, preference dataset export, and automated retraining triggers — LoyaltyLens Module 6*
 
 ---
 
-RLHF — Reinforcement Learning from Human Feedback — is the technique that turned GPT-3 into ChatGPT. In both cases, it involved massive amounts of human annotation, proprietary reward models, and significant computational resources.
-
-When I talk about "RLHF-style feedback loops" in a loyalty program context, I mean something more pragmatic: a system that captures campaign manager signals, uses those signals to measure whether the AI system is getting better or worse, and automatically triggers retraining when they indicate degradation.
-
-This post walks through LoyaltyLens Module 6, which implements that system end-to-end.
+**Series position:** Article 6 of 8
 
 ---
 
-## The Signal Problem
+Module 6 closes the production AI loop. It implements the feedback collection and retraining trigger infrastructure that turns human review signals into automated model improvement actions.
 
-Before you can build a feedback loop, you need to decide what signal you're collecting and what it actually measures.
+RLHF (Reinforcement Learning from Human Feedback) in its full form — reward model training, RL fine-tuning loop — requires research team resources. This module implements the practical subset: capture the right signals, export them in the format needed for fine-tuning, and trigger retraining automatically when rolling quality degrades.
 
-In production, we have three signal types:
+---
 
-**Offer redemption** — Did the customer redeem the offer? Ground truth, but arrives 3–7 days after send. Too slow for rapid iteration.
+## Signal Selection
 
-**Campaign manager review** — Approve/reject before a campaign goes out. Highest quality, but expensive and unscalable.
+Three signal types are available in a loyalty AI system:
+
+**Offer redemption** — Ground truth (did the customer redeem?), but arrives 3–7 days after send. Too slow for rapid iteration cycles.
+
+**Campaign manager review** — Approve/reject before a campaign goes out. Highest quality, but expensive and doesn't scale.
 
 **In-app engagement** — Opens, taps, clicks. Real-time but noisy.
 
-LoyaltyLens implements a simplified version: thumbs up/down + 1–5 star rating from a review UI simulating the campaign manager signal.
+LoyaltyLens implements thumbs up/down + 1–5 star rating from a review UI — a simplified proxy for campaign manager signal that's fast to collect and directly tied to generated copy quality.
 
 ---
 
@@ -82,7 +84,7 @@ def get_stats() -> StatsResponse: ...
 def export_feedback() -> list[dict]: ...
 ```
 
-SQLite was the right choice here. The feedback database is local to the module, doesn't need concurrent writes from multiple services, and is trivially portable. No Docker, no connection strings, no migrations.
+SQLite is the right choice for this module. The feedback database is local, doesn't require concurrent writes from multiple services, and needs no separate server. No Docker, no connection strings, no migration tooling.
 
 The schema uses CHECK constraints to enforce data quality at the database layer:
 
@@ -270,13 +272,13 @@ python -m pytest tests/test_feedback.py -v
 
 ---
 
-## The Honest Limits
+## Practical Limits
 
-**This does not implement full RLHF.** True RLHF trains a reward model on the preference data, then uses that reward model in a reinforcement learning loop to fine-tune the base LLM. LoyaltyLens implements the feedback *collection* and *trigger* infrastructure — the foundation RLHF would be built on.
+**This is not full RLHF.** True RLHF trains a reward model on the preference data, then fine-tunes the base LLM using reinforcement learning against that reward model. This module implements the feedback *collection* and *trigger* infrastructure — the prerequisite layer that RLHF would build on.
 
-**It does not separate signal from noise.** A thumbs-up from someone who approves everything quickly is worth less than one from someone who reads carefully. In production you'd weight by annotator reliability.
+**Signal quality is unweighted.** A thumbs-up from a reviewer who approves everything quickly is worth less than one from a careful reviewer. Production systems weight feedback by annotator reliability.
 
-**It assumes honest feedback.** In a system with throughput targets, feedback quality degrades. Adversarial robustness in signal collection is a real engineering problem.
+**Honest feedback is assumed.** In systems with throughput targets, feedback quality degrades over time. Adversarial robustness in signal collection is a separate engineering concern.
 
 ---
 
@@ -303,21 +305,10 @@ Every arrow is a code path that runs without human intervention. The human decis
 
 ---
 
-## The End of the Series
+## Next: Module 7 — Integration and Cloud Deployment
 
-LoyaltyLens, taken as a whole, is a production-pattern demonstration of every component in a modern loyalty AI system:
-
-- A feature pipeline that enforces data quality at the store boundary
-- A propensity model with a model card, eval metrics, and a deployment path
-- RAG retrieval benchmarked across frameworks and vector databases
-- LLM-generated copy with prompt versioning and brand alignment checking
-- An LLMOps pipeline with drift monitoring, automated evaluation, and CI/CD gates
-- A feedback loop that turns human signals into automated model improvement triggers
-
-**← Back to Module 5: The LLMOps Pipeline** *(link to be added on publish)*
+The six modules now have a complete operational loop. Module 7 wires them into a single `LoyaltyLensPipeline.run_for_customer()` call and deploys the propensity model to a live AWS SageMaker endpoint — converting the local reference implementation into a cloud-deployable system.
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect Director specialising in AI, data, and platform architecture for large-scale enterprise programs.*
-
-*[LinkedIn](https://linkedin.com/in/pushparajanramar)*
+*Pushparajan Ramar — [LinkedIn](https://linkedin.com/in/pushparajanramar) · [GitHub](https://github.com/Pushparajan/loyaltylens)*

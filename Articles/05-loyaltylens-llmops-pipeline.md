@@ -1,5 +1,5 @@
 ---
-title: "The LLMOps Stack I Wish Existed When We Started in Production"
+title: "Building an LLMOps Pipeline: Prompt Versioning, Drift Monitoring, and CI/CD"
 slug: "loyaltylens-llmops-pipeline"
 description: "Prompt versioning CLI, LLM-as-judge eval harness, PSI drift monitoring, GitHub Actions CI/CD with a hard quality gate, and a Streamlit monitoring dashboard."
 date: 2026-05-26
@@ -17,30 +17,35 @@ tags:
   - streamlit
 ---
 
-## Prompt versioning, drift detection, LLM-as-judge evaluation, and CI/CD for ML — LoyaltyLens Module 5
+# Building an LLMOps Pipeline: Prompt Versioning, Drift Monitoring, and CI/CD
+
+*Prompt versioning CLI, LLM-as-judge eval harness, PSI drift monitoring, and a GitHub Actions quality gate — LoyaltyLens Module 5*
 
 ---
 
-When I started leading the LLMOps architecture in production, the team had a working LLM integration that had been in production for a few months. Offer copy was being generated, campaigns were going out, customers were redeeming. On the surface, things looked fine.
-
-Underneath, there was no prompt versioning system. Prompts were stored in a config file that got overwritten with each deployment. There was no evaluation framework — quality was assessed by a campaign manager eyeballing a sample of outputs. There was no drift monitoring for the propensity model feeding the system. And the CI/CD pipeline for the ML components was the same YAML that deployed the React frontend.
-
-None of these gaps caused an incident while I was there. But each one was a loaded gun. This post is about building the safety mechanisms that prevent those guns from going off.
+**Series position:** Article 5 of 8
 
 ---
 
-## What LLMOps Actually Is (and Isn't)
+Module 5 adds the operational layer that keeps Module 4's LLM output reliable over time. A production LLM integration without these components has predictable failure modes: prompts get overwritten, quality degrades invisibly, data distribution shifts go undetected, and there is no automated gate preventing degraded outputs from reaching users.
 
-LLMOps is not a product category. It's not a platform you buy and install. It's a set of engineering disciplines applied to systems that include large language models as runtime components.
+This module implements the four core LLMOps disciplines:
 
-The core disciplines are:
+1. **Prompt versioning** — CLI for tracking, diffing, activating, and rolling back prompt versions
+2. **Automated evaluation** — BLEU + ROUGE-L + LLM-as-judge harness with a 0.75 quality gate
+3. **Drift monitoring** — PSI-based propensity score distribution monitoring
+4. **CI/CD pipeline** — GitHub Actions workflow that enforces the eval gate before every deploy
+
+---
+
+## What LLMOps Covers
+
+LLMOps is the set of engineering disciplines applied to systems that include large language models as runtime components — specifically:
 
 1. **Prompt versioning** — tracking, diffing, and rolling back prompt changes with the same rigor as code
 2. **Model evaluation** — measuring output quality with automated metrics and human-in-the-loop signals
-3. **Drift monitoring** — detecting when the distribution of model inputs or outputs has shifted from the baseline
+3. **Drift monitoring** — detecting when the distribution of model inputs or outputs has shifted from baseline
 4. **Deployment governance** — gates that prevent degraded models or prompts from reaching production
-
-LoyaltyLens Module 5 implements all four. Let me walk through each one.
 
 ---
 
@@ -129,13 +134,11 @@ class OfferCopyEvaluator:
         return float(self._rouge.score(generated, reference)["rougeL"].fmeasure)
 ```
 
-I'm honest about what these metrics measure: lexical overlap with a reference. In a world where every good offer copy headline is different, lexical overlap is a weak proxy for quality. But it catches regressions — if BLEU drops significantly between prompt versions, something meaningful changed.
+BLEU and ROUGE-L measure lexical overlap with a reference — a weak proxy for quality in a domain where good headlines vary widely. Their value is regression detection: a significant BLEU drop between prompt versions indicates something meaningful changed.
 
 ### Type 2: LLM-as-Judge
 
-This is the metric that matters most, and it's the one most teams skip because it feels circular to use an LLM to evaluate LLM output.
-
-The circularity concern is real but manageable. The key is using a *different* model as the judge (GPT-4o as judge for Mistral-generated copy), using a structured rubric, and calibrating the judge against human ratings before trusting it.
+LLM-as-judge is the metric with the highest signal-to-noise ratio for output quality. The circularity concern — using an LLM to evaluate LLM output — is managed by using a different model as judge (GPT-4o judges Mistral-generated copy), using a structured rubric, and calibrating against human ratings.
 
 ```python
 _JUDGE_PROMPT = """\
@@ -177,7 +180,7 @@ def aggregate_score(self, copy: OfferCopyInput, reference: str) -> float:
     return 0.2 * b + 0.2 * r + 0.6 * judge_avg
 ```
 
-The 0.75 threshold for the CI gate was calibrated against human ratings of offer copies. Anything above 0.75 had a high human approval rate. It's not a perfect threshold, but it's a defensible one.
+The 0.75 threshold is calibrated against human ratings: outputs scoring above 0.75 have a high human approval rate. Adjust this value based on your own human-rating calibration data.
 
 ### The CI Eval Gate
 
@@ -240,7 +243,7 @@ python llmops/drift_monitor/run_drift.py --output drift_report.json
    Report written to drift_report.json
 ```
 
-When I first ran this in production, we found a PSI of 0.31 — critical — on a Monday morning. The cause was a weekend batch job that had recomputed recency features using a different timezone offset, shifting every customer's `recency_days` by one. We caught it in 20 minutes because the drift monitor ran at 6am. Without it, we would have caught it in three weeks when campaign analysts noticed the redemption rate drop.
+A common real-world failure case: PSI spikes to 0.31 (critical) on a Monday morning. Root cause — a weekend batch job recomputed recency features using a different timezone offset, shifting every customer's `recency_days` by one. With a drift monitor running at 6am, this surfaces in 20 minutes. Without it, campaign analysts notice the redemption rate drop three weeks later.
 
 ---
 
@@ -294,7 +297,7 @@ jobs:
         run: uv run python shared/deploy.py --env staging
 ```
 
-The `eval-gate` job is the critical one. A prompt change that degrades output quality will never reach production. The `drift-check` job runs on PRs and posts the PSI directly into the PR comment thread — reviewers see drift impact before merging.
+The `eval-gate` job is the critical path: a prompt change that degrades output quality never reaches production. The `drift-check` job runs on PRs and posts the PSI directly into the PR comment thread so reviewers see drift impact before merging.
 
 ---
 
@@ -326,7 +329,7 @@ Run it with:
 streamlit run llmops/dashboard/app.py
 ```
 
-The four-metric header row is designed so each audience — data scientist, campaign manager, LLMOps engineer — finds their signal within 10 seconds of opening the page.
+The four-metric header gives each audience — data scientist, campaign manager, LLMOps engineer — their relevant signal within 10 seconds.
 
 ---
 
@@ -348,12 +351,12 @@ python -m pytest tests/test_llmops.py tests/test_llmops_evaluator.py tests/test_
 
 ---
 
-## Next: Closing the Loop with RLHF
+## Next: Module 6 — RLHF Feedback Loop
 
-Module 5 detects degradation. Module 6 responds to it. In the final post in this series I walk through the feedback capture UI, the preference dataset builder, and the retraining trigger that turns customer thumbs up/down signals into automated model improvements.
+Module 5 detects degradation. Module 6 responds to it: a feedback capture API, React review UI, preference dataset exporter, and an automated retraining trigger that fires a GitHub Actions `workflow_dispatch` when rolling quality drops below threshold.
 
 **→ Read Module 6: RLHF Feedback Loops — Turning Customer Signals Into Model Improvements** *(link to be added on publish)*
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect Director in enterprise consulting. He defines AI governance frameworks, responsible AI guardrails, and LLMOps practices for enterprise deployments. Connect on [LinkedIn](https://linkedin.com/in/pushparajanramar).*
+*Pushparajan Ramar — [LinkedIn](https://linkedin.com/in/pushparajanramar) · [GitHub](https://github.com/Pushparajan/loyaltylens)*

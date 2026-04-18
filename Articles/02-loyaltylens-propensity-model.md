@@ -1,8 +1,8 @@
 ---
-title: "Why I Used a Transformer (Not XGBoost) for Tabular Propensity Scoring"
+title: "PyTorch Propensity Scoring with TabTransformer"
 slug: "loyaltylens-propensity-model"
 description: "Building a production-grade offer redemption predictor with PyTorch — TabTransformer architecture, MLflow tracking, model cards, and the SageMaker deployment path."
-date: 2026-05-05
+date: 2026-04-30
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 2
@@ -16,33 +16,33 @@ tags:
   - sagemaker
 ---
 
-# Why I Used a Transformer (Not XGBoost) for Tabular Propensity Scoring
+# PyTorch Propensity Scoring with TabTransformer
 
-*Building a production-grade offer redemption predictor with PyTorch — LoyaltyLens Module 2*
-
----
-
-The most common question I get when I tell people I worked on a production loyalty AI platform is: "What model do you actually use?"
-
-The answer is less exotic than people hope. The core is a propensity scorer — a model that takes a customer's behavioral feature vector and outputs a probability that they'll redeem a given offer. What makes these systems interesting isn't the model class, it's the infrastructure around it: how features are computed in real time, how the model is versioned and monitored, and how the output feeds into a larger decisioning system.
-
-For LoyaltyLens Module 2, I built a clean-room version of that scorer. The model choice — a TabTransformer-lite in PyTorch — sparked the most interesting architectural debate I've had in a while. This post explains the decision and walks through the full implementation.
+*TabTransformer architecture, MLflow experiment tracking, model cards, and TorchScript export — LoyaltyLens Module 2*
 
 ---
 
-## XGBoost vs. Transformer for Tabular Data: The Real Tradeoff
+**Series position:** Article 2 of 8
 
-If you've done ML on tabular data in the last five years, your default answer is probably XGBoost or LightGBM. They're fast to train, robust to feature scaling, and hard to beat on small-to-medium tabular datasets. For 50,000 records with 6 features, XGBoost would almost certainly win on raw AUC.
+---
 
-So why use a transformer?
+Module 2 builds the propensity scoring model: a PyTorch neural network that takes a customer's six behavioral features from Module 1 and outputs a probability (0–1) that the customer will redeem a loyalty offer.
 
-Three reasons, in order of importance:
+This article covers the architecture decision, the full training pipeline, the model card, the FastAPI serving layer, and the TorchScript export path for SageMaker deployment.
 
-**1. Composability with the rest of the stack.** The LoyaltyLens system eventually needs to process offer text, customer history sequences, and potentially image signals from Module 4. A transformer backbone makes it straightforward to add attention over offer sequences or concatenate text embeddings later. XGBoost is a dead end for multimodal extension.
+---
 
-**2. Attention is interpretable in a useful way.** When a stakeholder in production asks "why did this customer get this offer?", attention weights over the feature vector give you a human-readable answer. Not perfect — attention-as-explanation has well-documented limitations — but better than SHAP values on a gradient boosted tree for non-technical audiences.
+## Architecture Decision: TabTransformer vs. XGBoost
 
-**3. This is a portfolio project.** There is genuine pedagogical value in implementing the architecture you'll use at scale. Production loyalty AI systems run transformer-based components at scale. I wanted the LoyaltyLens codebase to reflect that, not regress to 2018-era ML conventions.
+XGBoost and LightGBM are the standard choices for tabular ML — fast to train, robust to feature scaling, and hard to beat on small-to-medium datasets. For 50,000 records with 6 features, XGBoost would likely win on raw AUC.
+
+The TabTransformer is chosen here for three reasons:
+
+**1. Composability with the rest of the stack.** When the system needs to process offer text, customer history sequences, or image signals (Module 4), a transformer backbone extends naturally. XGBoost is a dead end for multimodal extension.
+
+**2. Attention provides interpretable explanations.** Attention weights over the feature vector give a human-readable answer to "why did this customer get this offer?" — more accessible to non-technical stakeholders than SHAP values on a gradient-boosted tree.
+
+**3. Architecture parity with production systems.** Production loyalty AI platforms run transformer-based components at scale. Implementing the same architecture — even simplified — produces a more useful reference than regressing to earlier-generation models.
 
 ---
 
@@ -413,49 +413,57 @@ Invoke-RestMethod -Method POST -Uri http://localhost:8001/predict `
 
 ## The SageMaker Path
 
-For production deployment, the model exports to ONNX and wraps in a SageMaker PyTorch serving container:
+For cloud deployment, the model is exported to TorchScript and served in a SageMaker PyTorch container. This is covered in depth in Module 7, but the key constraint is worth knowing now: the SageMaker PyTorch serving container's default `model_fn` calls `torch.jit.load`. A plain state-dict checkpoint will fail at container startup with `ModelLoadError: Please ensure model is saved using torchscript`.
+
+The export uses `torch.jit.trace` (not `torch.jit.script`) because `TabTransformerNet.forward()` iterates over a `ModuleList` — a pattern TorchScript handles, but PyTorch's `TransformerEncoderLayer` introduces non-deterministic graph structures across trace invocations. `check_trace=False` disables the graph-comparison sanity check; the values remain identical.
 
 ```python
-# Export to ONNX
-dummy_input = torch.randn(1, 6)
-torch.onnx.export(
-    net, dummy_input,
-    "models/propensity.onnx",
-    input_names=["features"],
-    output_names=["propensity_score"],
-    dynamic_axes={"features": {0: "batch_size"}},
-)
+# deploy/sagemaker_deploy.py
+def export_to_torchscript(self, checkpoint_path: str, output_path: str = "model.pt") -> str:
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    cfg = checkpoint["config"]
+    net = TabTransformerNet(cfg)
+    net.load_state_dict(checkpoint["state_dict"])
+    net.eval()
+
+    dummy = torch.zeros(1, cfg.n_features)
+    scripted = torch.jit.trace(net, dummy, check_trace=False)
+    torch.jit.save(scripted, output_path)
+    return output_path
 ```
 
+The SageMaker inference entry point:
+
 ```python
-# inference.py (SageMaker entry point)
 def model_fn(model_dir):
-    import onnxruntime as rt
-    return rt.InferenceSession(f"{model_dir}/propensity.onnx")
+    return torch.jit.load(str(Path(model_dir) / "model.pt"), map_location="cpu")
 
 def predict_fn(input_data, model):
-    return model.run(None, {"features": input_data})[0]
+    with torch.no_grad():
+        score = float(model(input_data).squeeze().item())
+    return {"propensity_score": score,
+            "model_version": os.environ.get("MODEL_VERSION", "1")}
 ```
 
-The ONNX export adds ~3ms inference latency overhead vs. native PyTorch but cuts the container image size from 4.2GB to 380MB — a practical win for SageMaker real-time endpoint cold starts.
+The full deployment pipeline — TorchScript export, `model.tar.gz` packaging, S3 upload, endpoint creation, invoke, and teardown — is implemented in `deploy/sagemaker_deploy.py` and covered in Article 7. The live endpoint returns consistent predictions with the local model (`propensity_score: 0.99` for a high-engagement customer).
 
 ---
 
-## What I'd Do Differently at Production Scale
+## Production Considerations
 
-Three things I simplified here that matter enormously in production:
+Three simplifications in this implementation that require attention at production scale:
 
-**Time-based validation.** I used a random 70/15/15 split. In production, you always use a temporal split — train on months 1–8, validate on month 9, test on month 10. Leaking future information into training inflates AUC by 3–7 points and gives you false confidence.
+**Time-based train/val split.** This module uses a random 70/15/15 split. In production, always use a temporal split — train on months 1–8, validate on month 9, test on month 10. Leaking future information into training inflates AUC by 3–7 points and produces false confidence in evaluation results.
 
-**More features.** Six features is a clean demo. Production systems typically use 40+ features including: time-of-day purchase patterns, product category preferences, seasonal engagement deltas, and in-app interaction sequences. The transformer architecture scales to that without structural changes — just widen the input layer.
+**Feature breadth.** Six features is sufficient for a reference implementation. Production systems typically use 40+ features: time-of-day purchase patterns, product category preferences, seasonal engagement deltas, and in-app interaction sequences. The transformer architecture scales without structural changes — increase `n_features` in `TabTransformerConfig` and widen the input layer accordingly.
 
-**Calibration.** Sigmoid output is not a calibrated probability. In production I apply Platt scaling or isotonic regression after training to ensure that a score of 0.6 actually corresponds to a 60% redemption rate. This matters enormously when you're using the score to set offer send thresholds and cost curves.
+**Score calibration.** Sigmoid output is not a calibrated probability. Apply Platt scaling or isotonic regression after training to ensure a score of 0.6 corresponds to a 60% redemption rate. This matters when the score drives offer send thresholds and campaign cost curves.
 
 ---
 
-## Next: RAG Offer Intelligence
+## Next: Module 3 — RAG Offer Retrieval
 
-The propensity score from this model is one input to the next stage: retrieving the *right* offer from a catalog of 200 options using semantic vector search. In Module 3 I'll walk through building dual retrieval pipelines with LangChain and LlamaIndex, comparing pgvector against Weaviate on latency and precision@5, and the design decision that mirrors how we handle offer targeting in production.
+The propensity score is one input to the next stage: retrieving the right offer from a catalog of 200 options using semantic vector search. Module 3 covers dual retrieval pipelines with LangChain and LlamaIndex, latency and precision@5 benchmarks comparing pgvector against Weaviate, and the vector store selection decision framework.
 
 **[→ Read Module 3: Building a RAG Offer Retrieval System with LangChain, LlamaIndex, and pgvector](#)**
 

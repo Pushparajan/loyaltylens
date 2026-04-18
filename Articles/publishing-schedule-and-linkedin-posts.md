@@ -34,20 +34,23 @@ Here's why this specific slot — and not the "classic" 8–9 AM advice you'll s
 
 Blog articles should go live **the same day as the LinkedIn post**, ideally **30–60 minutes before** the LinkedIn post goes out. This way, when someone clicks your link, the article is already indexed and loading cleanly.
 
-| Week | Date | Article | Blog Publish (CT) | LinkedIn Post (CT) | Frontmatter Date |
-|---|---|---|---|---|---|
-| 1 | **Tue Apr 21** | Article 0 — Setup & Glossary | 3:00 PM | 4:00 PM | 2026-04-21 |
-| 2 | **Tue Apr 28** | Article 1 — Feature Pipeline | 3:00 PM | 4:00 PM | 2026-04-28 |
-| 3 | **Tue May 5** | Article 2 — Propensity Model | 3:00 PM | 4:00 PM | 2026-05-05 |
-| 4 | **Tue May 12** | Article 3 — RAG Retrieval | 3:00 PM | 4:00 PM | 2026-05-12 |
-| 5 | **Tue May 19** | Article 4 — LLM Generator | 3:00 PM | 4:00 PM | 2026-05-19 |
-| 6 | **Tue May 26** | Article 5 — LLMOps Pipeline | 3:00 PM | 4:00 PM | 2026-05-26 |
-| 7 | **Tue Jun 2** | Article 6 — RLHF Feedback Loop | 3:00 PM | 4:00 PM | 2026-06-02 |
-| 8 | **Tue Jun 9** | Article 7 — Recap & Next Steps | 3:00 PM | 4:00 PM | 2026-06-09 |
+The series publishes **twice weekly — Thursday and Tuesday** — starting Thursday 23 April. Thursday posts use the 2:00 PM CT window (strong for longer-form thought leadership). Tuesday posts use the 4:00 PM CT window (highest engagement day).
 
-**Series runs: April 21 → June 9, 2026 (8 weeks)**
+| # | Date | Day | Article | Blog Publish (CT) | LinkedIn Post (CT) | Frontmatter Date |
+|---|---|---|---|---|---|---|
+| 0 | **Apr 23** | Thu | Article 0 — Setup & Glossary | 1:00 PM | 2:00 PM | 2026-04-23 |
+| 1 | **Apr 28** | Tue | Article 1 — Feature Pipeline | 3:00 PM | 4:00 PM | 2026-04-28 |
+| 2 | **Apr 30** | Thu | Article 2 — Propensity Model | 1:00 PM | 2:00 PM | 2026-04-30 |
+| 3 | **May 5** | Tue | Article 3 — RAG Retrieval | 3:00 PM | 4:00 PM | 2026-05-05 |
+| 4 | **May 7** | Thu | Article 4 — LLM Generator | 1:00 PM | 2:00 PM | 2026-05-07 |
+| 5 | **May 12** | Tue | Article 5 — LLMOps Pipeline | 3:00 PM | 4:00 PM | 2026-05-12 |
+| 6 | **May 14** | Thu | Article 6 — RLHF Feedback Loop | 1:00 PM | 2:00 PM | 2026-05-14 |
+| 7 | **May 19** | Tue | Article 7 — Integration & Cloud Deploy | 3:00 PM | 4:00 PM | 2026-05-19 |
+| 8 | **May 21** | Thu | Article 8 — Recap & Next Steps | 1:00 PM | 2:00 PM | 2026-05-21 |
 
-One-week gap between articles gives the LinkedIn algorithm time to settle each post, avoids cannibilising your own reach, and gives readers time to engage and share before the next one lands.
+**Series runs: April 23 → May 21, 2026 (4 weeks, twice-weekly cadence)**
+
+Two articles per week accelerates the series to completion in one month. The Tue/Thu alternation uses each day's optimal posting window and avoids back-to-back same-day posts that would compete for algorithm attention.
 
 ---
 

@@ -1,11 +1,11 @@
 ---
-title: "LoyaltyLens: What We Built, What We Learned, and What to Build Next"
+title: "LoyaltyLens Series Recap: Architecture Decisions, Lessons, and What to Build Next"
 slug: "loyaltylens-recap-next-steps"
-description: "A complete series recap — module-by-module decisions, five honest lessons from building a production AI system, and a prioritised roadmap for what to build next."
-date: 2026-06-09
+description: "Module-by-module architecture decisions, five key lessons from building a production AI system end-to-end, and a prioritised roadmap for extending LoyaltyLens to production."
+date: 2026-05-21
 author: Pushparajan Ramar
 series: loyaltylens
-series_order: 7
+series_order: 8
 reading_time: 10
 tags:
   - machine-learning
@@ -17,21 +17,19 @@ tags:
   - loyaltylens
 ---
 
-# LoyaltyLens: What We Built, What We Learned, and What to Build Next
+# LoyaltyLens Series Recap: Architecture Decisions, Lessons, and What to Build Next
 
-*A complete recap of the seven-part series on production-grade loyalty AI — and the honest lessons from building it*
-
----
-
-**Series position:** Article 7 of 7 — Recap & next steps
+*Module-by-module decisions, key lessons, and the production extension roadmap*
 
 ---
 
-Seven articles. Six modules. One end-to-end system.
+**Series position:** Article 8 of 8 — Recap & next steps
 
-If you've read this series from the beginning, you've built — or at least read the detailed design of — a production-pattern loyalty offer intelligence platform: from raw event ingestion to feature engineering, from propensity scoring to RAG retrieval, from LLM copy generation to LLMOps pipelines and RLHF feedback loops.
+---
 
-This final post does three things: recaps what was built and why each decision was made, surfaces the honest lessons that only became clear at the end, and maps out what to build next if you want to take LoyaltyLens into real production.
+Eight articles. Seven modules. One end-to-end system.
+
+This article does three things: recaps the key architecture decision in each module and why it was made, distills the five lessons that only emerge when the full system runs end-to-end, and maps the prioritised roadmap for extending LoyaltyLens to production scale.
 
 ---
 
@@ -97,42 +95,60 @@ This final post does three things: recaps what was built and why each decision w
 
 ---
 
-## The Five Honest Lessons
+### Module 7 — Integration Layer & Cloud Deployment
 
-### 1. The plumbing is harder than the model
+**What:** A `LoyaltyLensPipeline` class in `shared/pipeline.py` that wires all six modules — feature store, propensity predictor, Weaviate retriever, and LLM generator — into a single `run_for_customer()` call with per-stage latency tracking. A `deploy/` module that exports the PyTorch model to TorchScript, packages it for SageMaker, and deploys a real-time inference endpoint on AWS SageMaker and GCP Vertex AI.
 
-The propensity model took about four hours to design, implement, and get training. The feature store, feature validation, serving endpoint, drift monitor, and feedback loop — the plumbing around the model — took the rest of the project. This ratio holds in production. If your team is spending most of its time on model architecture, something is wrong. The model is rarely the bottleneck.
+**The decision that mattered:** Using `torch.jit.trace` (not `torch.jit.script`) for the TorchScript export, with `check_trace=False`. The SageMaker PyTorch serving container's default `model_fn` requires TorchScript. Plain state-dict checkpoints fail at container startup with `ModelLoadError`. `TransformerEncoderLayer` takes a different fused-op path across trace invocations — the graph structure differs between two traces even when the values are identical — so the standard sanity check must be disabled. This is the kind of detail that only surfaces when you actually deploy to a real endpoint, not a local container.
 
-### 2. Versioning everything is not optional
-
-Prompts, feature definitions, model artifacts, training datasets — all of them need version numbers, creation timestamps, and the ability to diff between versions. The PSI drift story (a timezone offset shifting every customer's `recency_days` by one) wasn't caught because of good model monitoring. It was caught because we had a baseline distribution to compare against. Without versioning, there is no baseline.
-
-### 3. The eval gate is a forcing function for quality standards
-
-Before adding the automated eval harness, prompt changes were reviewed by whoever happened to be available. After adding the eval gate, prompt changes required passing a quantitative quality bar before deployment. The bar didn't change — the accountability did. Automated evaluation doesn't replace human judgment; it makes the standard explicit and enforceable.
-
-### 4. PSI is the most underused metric in production ML
-
-Population Stability Index is a standard tool in credit risk modeling that almost nobody in the ML/AI community uses outside of that domain. It's fast to compute, interpretable (below 0.1 = stable, above 0.2 = retrain), and catches data distribution shifts before they manifest as prediction quality problems. It belongs in every production ML monitoring stack.
-
-### 5. Collect feedback before you know how to use it
-
-The preference dataset exporter in Module 6 writes JSONL in a format ready for fine-tuning. Fine-tuning isn't implemented in LoyaltyLens. That's fine. The point is that the feedback collection infrastructure is in place. When the team is ready to fine-tune — or to train a reward model, or to run a DPO training run — the data is already there. Start collecting before you have a use case. You'll have one eventually.
+**What this mirrors in production:** End-to-end ML pipeline orchestration, cloud-native inference deployment, model serving container constraints, IAM role separation (user credentials vs. execution role).
 
 ---
 
-## What to Build Next
+## Five Key Lessons
 
-If LoyaltyLens is running end-to-end locally, here are the natural extensions in priority order:
+### 1. The plumbing outweighs the model
 
-### Priority 1 — Deploy to a real cloud endpoint
+The propensity model takes a few hours to implement and train. The feature store, validation layer, serving endpoint, drift monitor, and feedback loop take the rest of the project. This ratio is consistent in production: if the team is spending most of its time on model architecture, the model is not the bottleneck. The operational infrastructure around it is.
 
-Export the propensity model to ONNX, wrap it in a SageMaker PyTorch serving container, and deploy to a `ml.t2.medium` real-time endpoint. This is the step that converts the project from a local demo to a portfolio artifact that demonstrates cloud ML deployment. Vertex AI is an equally valid target if you're GCP-certified.
+### 2. Versioning is a prerequisite, not a feature
+
+Prompts, feature definitions, model artifacts, training datasets — all require version numbers, creation timestamps, and the ability to diff between versions. The PSI drift example (a timezone offset shifting every customer's `recency_days` by one) is only detectable because a baseline distribution exists to compare against. Without versioning, there is no baseline and no detection.
+
+### 3. The eval gate enforces standards that reviews cannot
+
+An automated eval gate converts a qualitative standard ("good copy") into a quantitative threshold (aggregate score ≥ 0.75) that blocks deployment when violated. Human review is inconsistent; a gate is not. Automated evaluation does not replace human judgment — it makes the standard explicit and removes the dependency on whoever happens to be available.
+
+### 4. PSI belongs in every production ML monitoring stack
+
+Population Stability Index is standard practice in credit risk modeling and largely absent from ML/AI monitoring outside that domain. It is fast to compute, directly interpretable (PSI < 0.1 = stable, > 0.2 = retrain), and catches data distribution shifts before they manifest as prediction quality problems. The timezone-offset bug surfaces as PSI = 0.31 at 6am; without the monitor, it surfaces as a redemption rate drop three weeks later.
+
+### 5. Collect preference data before you need it
+
+The preference dataset exporter in Module 6 writes JSONL in the format required for LLM fine-tuning. The fine-tuning step is not implemented in LoyaltyLens — and that is the correct order of operations. The collection infrastructure should be in place before the use case is defined. When the team is ready to fine-tune, run DPO, or train a reward model, the labeled data already exists.
+
+---
+
+## Extension Roadmap
+
+Extensions in priority order for taking LoyaltyLens from reference implementation to production system:
+
+### Priority 1 — ✅ Deploy to a real cloud endpoint
+
+Done. The propensity model is exported to TorchScript and deployed to a `ml.t2.medium` SageMaker real-time endpoint. The live endpoint returns consistent predictions with the local model (`propensity_score: 0.99` for a high-engagement customer). GCP Vertex AI deployment is also implemented in `deploy/vertex_deploy.py`.
 
 ```bash
-# The two commands that take LoyaltyLens to cloud inference
-python propensity_model/export_onnx.py
-python shared/deploy.py --target sagemaker --env staging
+# Deploy (packages TorchScript model, uploads to S3, creates endpoint — ~10 min)
+python deploy/sagemaker_deploy.py --action deploy --model-path models/propensity_v1.pt
+
+# Invoke
+python deploy/sagemaker_deploy.py --action invoke \
+  --payload '{"recency_days": 3, "frequency_30d": 5, "monetary_90d": 120,
+              "offer_redemption_rate": 0.4, "channel_preference": "mobile",
+              "engagement_score": 0.7}'
+
+# Teardown (always — SageMaker charges for endpoint uptime)
+python deploy/sagemaker_deploy.py --action teardown
 ```
 
 ### Priority 2 — Add a time-based train/val split
@@ -141,15 +157,15 @@ Replace the random 70/15/15 split in `train.py` with a temporal split: train on 
 
 ### Priority 3 — Domain-adapt the embedding model
 
-Fine-tune `all-MiniLM-L6-v2` on your offer descriptions using contrastive learning (positive pairs: offers in the same category that were both redeemed by the same customer; negative pairs: offers that were never co-redeemed). A domain-adapted embedding model reliably outperforms a general-purpose one on domain-specific retrieval — typically 5–12 precision@5 improvement.
+Fine-tune `all-MiniLM-L6-v2` on offer descriptions using contrastive learning: positive pairs are offers co-redeemed by the same customer; negative pairs are offers never co-redeemed. Domain adaptation reliably improves retrieval precision — typically 5–12 precision@5 points on loyalty-specific catalogs.
 
 ### Priority 4 — Implement hybrid retrieval
 
 Add BM25 keyword search alongside the dense vector retrieval in Module 3, and fuse the results using reciprocal rank fusion. This handles the cases where exact product names matter more than semantic similarity — a common pattern in large offer catalogs where customers search for specific reward types.
 
-### Priority 5 — Write the blog post about deploying it
+### Priority 5 — Document and share your deployment experience
 
-The most underrated portfolio move for any engineer is publishing a specific, honest account of building something — including what didn't work. If you've followed this series and built LoyaltyLens, you have a story to tell. Write it on your own blog, link to the GitHub repo, and share it. That post will do more for your professional presence than the code itself.
+Building LoyaltyLens and deploying it produces a specific, concrete technical narrative — including what failed and why. Publishing that account, linked to the GitHub repo, creates a more durable professional artifact than the code alone. The production errors (the `ModelLoadError`, the IAM execution role separation, the `check_trace=False` workaround) are exactly the details that make technical writing useful.
 
 ---
 
@@ -159,23 +175,24 @@ The most underrated portfolio move for any engineer is publishing a specific, ho
 |---|---|---|
 | **Article 0** | Setup & Glossary | Environment, acronyms, mental model |
 | **Article 1** | Feature Pipeline | DuckDB feature store, RFM features, validation |
-| **Article 2** | Propensity Model | PyTorch TabTransformer, MLflow, SageMaker |
+| **Article 2** | Propensity Model | PyTorch TabTransformer, MLflow, TorchScript |
 | **Article 3** | RAG Retrieval | LangChain vs. LlamaIndex, pgvector vs. Weaviate |
 | **Article 4** | LLM Generator | Prompt registry, CLIP brand alignment, multimodal |
 | **Article 5** | LLMOps Pipeline | PSI drift, eval gate, CI/CD, responsible AI |
 | **Article 6** | RLHF Feedback Loop | Preference data, retraining trigger, closing the loop |
-| **Article 7** | Recap & Next Steps | Lessons, priorities, what to build next |
+| **Article 7** | Integration & Cloud Deploy | Pipeline orchestration, SageMaker, Vertex AI |
+| **Article 8** | Recap & Next Steps | Lessons, priorities, what to build next |
 
 ---
 
 ## Where to Go From Here
 
-The LoyaltyLens repository is open. The full developer guide (with the Claude Code prompts for every module) is linked in the repo README. If you build on it, improve it, or deploy it — I'd genuinely like to hear about it.
+The LoyaltyLens repository is open. The full developer guide with the Claude Code prompts for every module is linked in the repo README.
 
-If there are topics in the series you'd like me to go deeper on — the SageMaker deployment path, the domain-adaptation fine-tuning, the DPO fine-tuning loop, or anything else — let me know via LinkedIn or the contact form on this site.
+For deeper coverage of specific topics — the SageMaker deployment path, domain-adaptation fine-tuning, the DPO fine-tuning loop, or hybrid retrieval implementation — reach out via LinkedIn or the contact form.
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect Director specializing in AI, data, and platform architecture. He writes about production AI systems, ML engineering, and the gap between research and deployment.*
+*Pushparajan Ramar — Enterprise Architect Director, AI and data platform architecture.*
 
-*[LinkedIn](https://linkedin.com/in/pushparajanramar) · [pushparajan.tech](https://pushparajan.tech)*
+*[LinkedIn](https://linkedin.com/in/pushparajanramar) · [GitHub](https://github.com/Pushparajan/loyaltylens)*

@@ -1,8 +1,8 @@
 ---
-title: "Prompt Engineering Is Software Engineering: Versioning, Testing, and Multimodal Extension"
+title: "LLM Offer Copy Generation: Prompt Registry, Dual Backends, and Brand Image Generation"
 slug: "loyaltylens-llm-generator"
-description: "Building the LLM offer copy generator — versioned YAML prompt registry, dual LLM backends, JSON parse retry logic, and Flux AI brand image generation via HuggingFace."
-date: 2026-05-19
+description: "Building the LLM offer copy generator — versioned YAML prompt registry, dual LLM backends, JSON parse retry logic, and FLUX.1 brand image generation via HuggingFace."
+date: 2026-05-07
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 4
@@ -17,22 +17,23 @@ tags:
   - image-generation
 ---
 
-# Prompt Engineering Is Software Engineering: Versioning, Testing, and Multimodal Extension
+# LLM Offer Copy Generation: Prompt Registry, Dual Backends, and Brand Image Generation
 
-## Building the LLM offer copy generator and Flux AI brand image generator — LoyaltyLens Module 4
-
----
-
+*Versioned YAML prompts, OpenAI and HuggingFace backends, JSON retry logic, and FLUX.1 brand image generation — LoyaltyLens Module 4*
 
 ---
 
-In 2023 I helped architect a global loyalty program's integration of a generative AI content platform into their content supply chain. The goal was to automate the generation of brand-consistent visual assets — the imagery that accompanies offer push notifications, email campaigns, and in-app banners. Flux AI is today's open-source answer to what those enterprise platforms provided, running free on HuggingFace's Inference API. But the hardest part of the project had nothing to do with which image model you use.
+**Series position:** Article 4 of 8
 
-The hardest part was treating prompts as production artifacts.
+---
 
-When you're generating content for a globally recognized loyalty brand, the difference between a prompt that produces on-brand output and one that produces subtly off-brand output is not obvious until it's in front of a customer. Catching that difference at the prompt level — before it reaches a creative review, before it ships — requires the same discipline as catching a software regression before it reaches production.
+Module 4 takes the offer retrieved in Module 3 and generates personalized copy for it. The module has three layers:
 
-That discipline is what Module 4 of LoyaltyLens is about.
+1. **Copy generation** — a versioned YAML prompt registry, two LLM backends (OpenAI and HuggingFace/Mistral-7B), and a structured `OfferCopy` generator with JSON parse retry logic
+2. **Brand alignment** — FLUX.1-schnell image generation from the offer copy via HuggingFace Inference API
+3. **Prompt governance** — machine-readable `eval_criteria` embedded in each prompt YAML, consumed by the eval harness in Module 5
+
+Treating prompts as production artifacts — versioned, testable, and auditable — is the central design principle of this module.
 
 ---
 
@@ -50,7 +51,7 @@ Most tutorials cover the middle layer only. The brand alignment layer — Flux A
 
 ## The Prompt Registry
 
-Before writing a single inference call, I built the prompt registry. Every prompt lives in a YAML file under version control:
+Every prompt lives in a YAML file under version control. The registry is built before any inference code:
 
 ```yaml
 # llm_generator/prompts/system_v1.yaml
@@ -107,7 +108,7 @@ version: 2
 # - Added constraint: never use the word "deal"
 ```
 
-That last constraint — "never use the word 'deal'" — came from a real brand feedback session in production. The word tests poorly with the loyalty customer base; it signals transactional intent rather than community membership. Capturing that as a prompt constraint, versioned and auditable, is exactly the kind of governance that makes generative AI deployable at enterprise scale.
+That last constraint — "never use the word 'deal'" — is a brand guideline: the word signals transactional intent rather than community membership. Capturing brand constraints as versioned, auditable prompt rules is what makes generative AI deployable at enterprise scale.
 
 ---
 
@@ -182,7 +183,7 @@ class OfferCopyGenerator:
                 )
 ```
 
-The retry logic is not optional. In my testing, even well-prompted frontier models produce non-JSON output in roughly 2–4% of calls. At the scale of a million daily offer generations, 2% is 20,000 failed renders — a visible customer experience degradation.
+The retry logic is not optional. Even well-prompted frontier models produce non-JSON output in roughly 2–4% of calls. At a million daily offer generations, 2% is 20,000 failed renders — a visible degradation in customer experience.
 
 ---
 
@@ -234,15 +235,13 @@ class HuggingFaceBackend(LLMBackend):
         return output[len(prompt):].strip()
 ```
 
-The abstract base class is what makes this testable. In unit tests, I inject a `MockBackend` that returns predetermined JSON — no API calls, no GPU, deterministic test results. This is a practice that I've had to push teams on repeatedly: if your ML component can't be tested without a live model call, your CI pipeline will be slow, flaky, and expensive.
+The abstract base class is what makes this testable. In unit tests, inject a `MockBackend` that returns predetermined JSON — no API calls, no GPU, deterministic results. If an ML component can't be tested without a live model call, the CI pipeline will be slow, flaky, and expensive.
 
 ---
 
-## The Flux AI Brand Image Generator
+## The FLUX.1 Brand Image Generator
 
-This is the component that most directly mirrors what enterprise loyalty platforms do with generative visual AI — and it's available free via HuggingFace's Inference API.
-
-The idea is simple: once the LLM has produced the offer copy, use that copy as a text prompt to generate a matching campaign image. The `/generate` endpoint accepts an optional `generate_image: true` flag; when set, it feeds the headline and body into FLUX.1-schnell and saves the result alongside the copy.
+Once the LLM produces offer copy, the same copy serves as a text prompt to generate a matching campaign image. The `/generate` endpoint accepts an optional `generate_image: true` flag; when set, it feeds the headline and body into FLUX.1-schnell via the HuggingFace Inference API and saves the result alongside the copy.
 
 ```python
 # llm_generator/multimodal.py
@@ -270,9 +269,9 @@ class BrandImageGenerator:
         return path
 ```
 
-The model choice matters. FLUX.1-schnell is Black Forest Labs' fastest open model — four-step diffusion, no classifier-free guidance, runs in under two seconds on the HuggingFace serverless GPU tier. For brand asset generation at loyalty-programme scale, "fast and free during prototyping, swappable for a fine-tuned model in production" is exactly the right trade-off.
+FLUX.1-schnell is four-step diffusion with no classifier-free guidance — under two seconds on the HuggingFace serverless GPU tier. The interface is designed to swap in a fine-tuned brand model in production without changing calling code.
 
-The API wires it together. When `generate_image=true`, the endpoint concatenates headline and body into a single prompt, calls the generator, and returns the saved path:
+When `generate_image=true`, the endpoint concatenates headline and body into a single prompt and calls the generator:
 
 ```python
 # llm_generator/api.py — relevant excerpt
@@ -291,9 +290,9 @@ In production you would replace the free Inference API with a fine-tuned Flux va
 
 ---
 
-## A Sample Output
+## Sample Output
 
-Here's what the full generation pipeline produces for a high-engagement mobile-first customer with a pending double-points offer:
+Full generation pipeline output for a high-engagement mobile-first customer with a double-points offer:
 
 ```json
 {
@@ -308,7 +307,7 @@ Here's what the full generation pipeline produces for a high-engagement mobile-f
 }
 ```
 
-The phrase "you've been showing up for it" is interesting — it references the customer's engagement score implicitly, creating personalization without exposing the underlying metric. That's the kind of nuance that prompt v2 produces reliably, and prompt v1 produced occasionally.
+The body references the customer's engagement score implicitly ("you've been showing up for it") — personalization without exposing the underlying metric. This is what separates prompt v2 from v1: consistent nuance, not occasional nuance.
 
 ---
 
@@ -324,12 +323,12 @@ For a real-time offer push use case at scale, these latencies are fine — offer
 
 ---
 
-## Next: The LLMOps Pipeline
+## Next: Module 5 — LLMOps Pipeline
 
-Module 4 generates offer copy. Module 5 asks: is the copy getting better or worse over time? In the next post I walk through building a prompt versioning CLI, an LLM-as-judge evaluation harness, a propensity drift monitor with Population Stability Index, and the GitHub Actions pipeline that ties all of it together with a hard quality gate.
+Module 4 generates copy. Module 5 monitors whether it's getting better or worse over time: a prompt versioning CLI, an LLM-as-judge evaluation harness with a hard quality gate, a PSI-based propensity drift monitor, and a GitHub Actions CI/CD pipeline that ties all of it together.
 
 **[→ Read Module 5: Building an LLMOps Pipeline with Prompt Versioning, Drift Monitoring, and CI/CD](#)**
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect Director in enterprise consulting, where he leads AI and data platform strategy for Fortune 500 clients. Connect on [LinkedIn](https://linkedin.com/in/pushparajanramar).*
+*Pushparajan Ramar — [LinkedIn](https://linkedin.com/in/pushparajanramar) · [GitHub](https://github.com/Pushparajan/loyaltylens)*

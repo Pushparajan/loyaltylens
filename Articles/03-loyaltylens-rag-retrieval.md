@@ -1,7 +1,7 @@
 ---
-title: "LangChain vs. LlamaIndex in Production: What the Benchmarks Actually Show"
+title: "RAG Offer Retrieval: LangChain vs. LlamaIndex, pgvector vs. Weaviate"
 slug: "loyaltylens-rag-retrieval"
-description: "Building a RAG offer retrieval system — real latency and precision benchmarks comparing LangChain vs. LlamaIndex and pgvector vs. Weaviate at three catalog sizes."
+description: "Building a RAG offer retrieval system — latency and precision benchmarks comparing LangChain vs. LlamaIndex and pgvector vs. Weaviate at three catalog sizes."
 date: 2026-05-12
 author: Pushparajan Ramar
 series: loyaltylens
@@ -17,22 +17,19 @@ tags:
   - huggingface
 ---
 
-# LangChain vs. LlamaIndex in Production: What the Benchmarks Actually Show
+# RAG Offer Retrieval: LangChain vs. LlamaIndex, pgvector vs. Weaviate
 
-*Building a RAG offer retrieval system with pgvector and Weaviate — LoyaltyLens Module 3*
-
----
-
+*Dual retrieval pipelines, latency and precision@5 benchmarks at three catalog sizes — LoyaltyLens Module 3*
 
 ---
 
-Every RAG tutorial on the internet follows the same pattern: load some PDFs, chunk them, embed with OpenAI, store in Chroma, query with LangChain, marvel at the results. It's a fine starting point. It tells you almost nothing about what you need to know before you put RAG in production.
+**Series position:** Article 3 of 8
 
-In production, the offer intelligence system I architected has to retrieve the right offer for the right customer from a catalog of hundreds of options, in real time, with sub-200ms end-to-end latency. The vector retrieval step has a budget of roughly 30ms. That constraint changes every design decision.
+---
 
-For LoyaltyLens Module 3, I built a dual retrieval system — LangChain and LlamaIndex running in parallel against pgvector and Weaviate — and benchmarked them honestly. The results surprised me enough that I changed the default configuration of the production system I was running.
+Module 3 builds the semantic offer retrieval layer. Given a customer context string and a propensity score from Module 2, the retrieval system finds the five most relevant offers from a catalog of 200 using vector similarity search.
 
-Here's what I found.
+The module implements two retrieval frameworks (LangChain and LlamaIndex) against two vector stores (pgvector and Weaviate) and benchmarks all four combinations on latency (p50/p95) and precision@5 at catalog sizes of 200, 2,000, and 20,000 offers. This article covers the implementation and the benchmark results.
 
 ---
 
@@ -63,7 +60,7 @@ I generated 200 synthetic offers with realistic structure:
 }
 ```
 
-The `description` field is what gets embedded. It's deliberately written to carry semantic signal: category, channel preference, time-of-day context, and occasion. This is a practice I'd recommend for any production offer catalog — the quality of your retrieval is bounded by the quality of your offer descriptions.
+The `description` field is what gets embedded. It carries semantic signal deliberately: category, channel preference, time-of-day context, and occasion. Retrieval quality is bounded by description quality — invest in well-written offer descriptions before optimising the retrieval pipeline.
 
 ---
 
@@ -119,7 +116,7 @@ client = weaviate.connect_to_custom(
 )
 ```
 
-One thing worth noting: I index the pgvector table using `ivfflat`:
+The pgvector table is indexed using `ivfflat`:
 
 ```sql
 CREATE INDEX ON offer_embeddings
@@ -127,7 +124,7 @@ USING ivfflat (embedding vector_cosine_ops)
 WITH (lists = 20);
 ```
 
-With 200 offers this index doesn't matter — a linear scan is faster. With 50,000+ offers it becomes essential. I build it anyway because the architecture should work at scale.
+With 200 offers this index doesn't change performance — a linear scan is faster. With 50,000+ offers it becomes essential. Build it from the start so the architecture works at production scale without schema changes.
 
 ---
 
@@ -264,9 +261,9 @@ I ran 1,000 retrieval queries against both systems with a simulated offer catalo
 
 Precision@5 differences are within noise margin. The retrieval quality is nearly identical — which makes sense, since all four configurations are using the same embedding model and cosine similarity.
 
-**My recommendation:** For a greenfield system already running Postgres, **pgvector is the right first choice**. It eliminates a service dependency, simplifies your infrastructure, and performs well up to tens of millions of vectors. Switch to a dedicated vector database (Pinecone in production, Weaviate in self-hosted) when you're above ~50M vectors or need advanced filtering capabilities that SQL can't express efficiently.
+**Recommendation:** For a system already running Postgres, **pgvector is the right first choice**. It eliminates a service dependency, simplifies infrastructure, and performs well up to tens of millions of vectors. Switch to a dedicated vector database (Pinecone managed, Weaviate self-hosted) when you exceed ~50M vectors or need filtering capabilities that SQL can't express efficiently.
 
-This aligns with how I advise clients in enterprise consulting: don't add infrastructure complexity until you have a concrete scale requirement that forces it.
+Don't add infrastructure complexity until you have a concrete scale requirement that forces it.
 
 ---
 
@@ -317,24 +314,22 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8003/retrieve `
 
 ---
 
-## What This Looks Like in production Scale
+## Scaling This Architecture
 
-The production offer catalog is not 200 offers. It's thousands of offers spanning seasonal specials, partner promotions, personalized bonus points mechanics, and product pairings — many of which are targeted at specific customer micro-segments.
+The same design scales to production catalog sizes of thousands of offers. The changes required at enterprise scale:
 
-The architecture I described above scales to that. The specific changes at enterprise scale:
-
-- **Embedding model upgrade:** We use a domain-adapted model fine-tuned on loyalty program product descriptions and offer language. `all-MiniLM-L6-v2` is a general-purpose model; a domain-adapted model improves semantic retrieval by measurably reducing irrelevant retrievals.
-- **Hybrid retrieval:** BM25 keyword search and dense vector search are run in parallel; results are fused using reciprocal rank fusion. This handles cases where exact product names matter more than semantic similarity.
-- **Real-time context enrichment:** The `context_text` in LoyaltyLens is a manually constructed string. At the loyalty platform it's built dynamically from the customer's last 10 events, current location, time of day, and weather data — all assembled in the BFF layer before the retrieval call.
+- **Domain-adapted embedding model.** `all-MiniLM-L6-v2` is a general-purpose model. Fine-tuning on loyalty program offer language reduces irrelevant retrievals measurably. Use contrastive learning with positive pairs (offers co-redeemed by the same customer) and negative pairs (offers never co-redeemed).
+- **Hybrid retrieval.** Run BM25 keyword search and dense vector search in parallel; fuse results with reciprocal rank fusion. Handles cases where exact product names matter more than semantic similarity — common in large catalogs with named reward tiers.
+- **Dynamic context enrichment.** The `context_text` in LoyaltyLens is a manually constructed string. In production, assemble it dynamically from the customer's last N events, current location, time of day, and session signals in the BFF layer before the retrieval call.
 
 ---
 
-## Next: Generating Personalized Offer Copy with an LLM
+## Next: Module 4 — LLM Offer Copy Generation
 
-The retrieval step gives us the *right* offer. The next step is generating the *right message*. In Module 4 I walk through prompt engineering for offer copywriting, building a versioned prompt registry, and the CLIP-based brand image alignment scorer that mirrors what a generative AI content platform does in a loyalty content supply chain.
+Retrieval identifies the right offer. Module 4 generates the right message for it: a versioned prompt registry for offer copywriting, dual LLM backends (OpenAI and HuggingFace), JSON parse retry logic, and FLUX.1-based brand image generation.
 
 **[→ Read Module 4: LLM Offer Copy Generation and Brand Alignment Scoring](#)**
 
 ---
 
-*Pushparajan Ramar is an Enterprise Architect Director in enterprise consulting. He leads AI, data, and platform architecture for global enterprise programs. Connect on [LinkedIn](https://linkedin.com/in/pushparajanramar).*
+*Pushparajan Ramar — [LinkedIn](https://linkedin.com/in/pushparajanramar) · [GitHub](https://github.com/Pushparajan/loyaltylens)*

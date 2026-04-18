@@ -1,8 +1,8 @@
 ---
-title: "Before You Write a Single Line: The Complete Setup Guide and Glossary for LoyaltyLens"
+title: "LoyaltyLens Setup Guide and Glossary"
 slug: "loyaltylens-setup-glossary"
 description: "Complete environment setup, mental model, and plain-English glossary for every acronym in the LoyaltyLens series — RAG, PSI, RLHF, LLMOps, and 33 more."
-date: 2026-04-21
+date: 2026-04-23
 author: Pushparajan Ramar
 series: loyaltylens
 series_order: 0
@@ -17,27 +17,23 @@ tags:
   - loyaltylens
 ---
 
-# Before You Write a Single Line: The Complete Setup Guide and Glossary for LoyaltyLens
+# LoyaltyLens Setup Guide and Glossary
 
-Everything you need to understand the project, the stack, and the jargon — before Module 1
-
----
-
-**Series position:** Article 0 of 7 — Start here
+Complete environment setup, mental model, and reference glossary for the series
 
 ---
 
-I've been leading AI and data platform programs for large enterprises for six years. The single biggest drag on every new team member — regardless of their seniority — is not the code. It's the alphabet soup.
+**Series position:** Article 0 of 8 — Start here
 
-RAG. PSI. RLHF. BFF. pgvector. LLMOps. TabTransformer. The terms accumulate fast, and most tutorials assume you either already know them or are willing to Google each one mid-flow. Neither is a good reading experience.
+---
 
-This article is the one I wish existed when I started. It covers three things:
+This article covers three things before you touch any module code:
 
-1. **The complete environment setup** — everything installed and verified before you touch the LoyaltyLens modules
-2. **The mental model** — how the six modules fit together and why the system is designed the way it is
-3. **The glossary** — every acronym, abbreviation, and concept used across the series, defined in plain English with a note on where it shows up in the project
+1. **Environment setup** — everything installed and verified before you run the first module
+2. **Mental model** — how the seven modules fit together and why the architecture is designed the way it is
+3. **Glossary** — every acronym and concept used across the series, defined in plain English with a note on where each one appears in the codebase
 
-Read this once. Refer back to the glossary whenever something doesn't land.
+RAG. PSI. RLHF. BFF. pgvector. LLMOps. TabTransformer. The terms accumulate fast across eight articles. Read this once; refer back to the glossary whenever something doesn't land.
 
 ---
 
@@ -344,7 +340,7 @@ Get-Content .env | ForEach-Object {
 
 The token is optional for `all-MiniLM-L6-v2` (public model). It is required for gated models such as Llama or Mistral.
 
-**A note on API costs:** The project is designed to run with `gpt-4o-mini` as the LLM backend. Running the full eval harness (50 generations + 50 LLM judge calls) costs approximately **$0.03 per run**. The entire project from bootstrap to a working dashboard costs less than $1 in API calls. If you want zero API cost, the HuggingFace backend with Mistral-7B-Instruct runs locally — you'll need the 8 GB RAM headroom.
+**API cost note:** The default LLM backend is `gpt-4o-mini`. Running the full eval harness (50 generations + 50 LLM judge calls) costs approximately **$0.03 per run**. End to end from bootstrap to a working dashboard costs under $1 in API calls. For zero API cost, the HuggingFace backend with Mistral-7B-Instruct runs locally — requires the 8 GB RAM headroom.
 
 ---
 
@@ -413,7 +409,7 @@ claude login
 claude --version
 ```
 
-The prompts in each article are written for Claude Code specifically — they assume it can see your entire project directory and will create or modify multiple files in a single command. Running them in a web chat interface or a basic autocomplete tool will not produce the same results.
+The prompts in each article target Claude Code specifically — they require full project directory visibility and multi-file generation in a single command. Running them in a web chat interface or basic autocomplete tool will not produce equivalent results.
 
 ---
 
@@ -467,21 +463,24 @@ Raw Events (Parquet)
   │  quality gate: passes or blocks deployment
   ▼
 [M6] Feedback Loop (UI + aggregator + retraining trigger)
-  └─► signals flow back to M2 (retrain) and M5 (prompt rollback)
+  │  signals flow back to M2 (retrain) and M5 (prompt rollback)
+  ▼
+[M7] Integration & Cloud Deployment (shared/pipeline.py + deploy/)
+  └─► end-to-end pipeline orchestration; SageMaker / Vertex AI endpoint
 ```
 
 ### Why Each Module Is Separate
 
-A common question: why not build this as one script? The answer is operational — at enterprise scale, each of these layers is owned by a different team, deploys on a different cadence, and has different scaling requirements:
+Each module is a separate, independently deployable unit. In production systems, these layers are owned by different teams, deploy on different cadences, and have different scaling requirements:
 
-- The feature pipeline runs on a batch schedule (hourly in production)
-- The propensity model retrains weekly, or on trigger
+- The feature pipeline runs on a batch schedule (hourly)
+- The propensity model retrains weekly, or on drift trigger
 - The offer catalog is updated by the marketing team daily
 - The LLM copy generator version-gates on prompt approval
 - The LLMOps monitors run continuously
 - The feedback loop operates asynchronously
 
-Building them as separate, independently deployable modules mirrors that operational reality — and makes the architecture genuinely useful as a reference, not just a demo.
+This module boundary reflects operational reality, not just organizational convention — it's what makes the architecture useful as a reference rather than a monolithic script.
 
 ---
 
@@ -681,7 +680,7 @@ A set of metrics for evaluating text summarization and generation by measuring o
 ### S
 
 **SageMaker**
-AWS's fully managed ML platform. Handles model training (distributed, GPU-accelerated), model registry, endpoint deployment, and monitoring. In LoyaltyLens (M2): the ONNX export path and `inference.py` entry point are designed for SageMaker PyTorch serving containers. A stretch goal.
+AWS's fully managed ML platform. Handles model training (distributed, GPU-accelerated), model registry, endpoint deployment, and monitoring. In LoyaltyLens (M7): `deploy/sagemaker_deploy.py` exports the propensity model to TorchScript, packages it as `model.tar.gz`, deploys a real-time endpoint on `ml.t2.medium`, and exposes `invoke`/`teardown` CLI actions. The SageMaker PyTorch container requires TorchScript format (`torch.jit.trace`) — plain state-dict checkpoints fail at container startup.
 
 **Sentence Transformers**
 A family of transformer models fine-tuned to produce semantically meaningful sentence embeddings. `all-MiniLM-L6-v2` (used in LoyaltyLens M3) is a 22M parameter model producing 384-dim embeddings at ~50ms per batch on CPU. Much faster than using a large LLM for embeddings.
@@ -715,7 +714,7 @@ A Rust-based Python package manager from Astral that replaces pip, pip-tools, py
 ---
 
 **Vertex AI**
-Google Cloud's fully managed ML platform. Analogous to AWS SageMaker. Includes: training pipelines, model registry, online prediction endpoints, and the Text-Embeddings API for generating embeddings without a custom model. Mentioned as a deployment stretch goal in LoyaltyLens M3.
+Google Cloud's fully managed ML platform. Analogous to AWS SageMaker. Includes: training pipelines, model registry, online prediction endpoints, and a managed Vector Search service (HNSW-backed). In LoyaltyLens (M7): `deploy/vertex_deploy.py` deploys the propensity model to a Vertex AI online prediction endpoint and indexes offer embeddings in Vertex AI Vector Search.
 
 ---
 
@@ -734,7 +733,6 @@ An open-source vector database with a GraphQL/REST API, native support for multi
 | NumPy / Pandas | M1 | Event generation + feature computation |
 | PyTorch | M2 | PropensityModel training and inference |
 | MLflow | M2 | Experiment tracking |
-| ONNX | M2 | Model export for SageMaker |
 | HuggingFace sentence-transformers | M3 | Offer embedding generation |
 | pgvector | M3 | Primary vector store |
 | Weaviate | M3 | Secondary vector store (benchmark) |
@@ -750,6 +748,10 @@ An open-source vector database with a GraphQL/REST API, native support for multi
 | React + Vite | M6 | Feedback collection UI |
 | SQLite | M6 | Feedback persistence |
 | Preference dataset (JSONL) | M6 | RLHF training data export |
+| shared/pipeline.py | M7 | End-to-end pipeline orchestration (all 6 modules) |
+| torch.jit.trace (TorchScript) | M7 | Model export for SageMaker serving container |
+| boto3 | M7 | AWS SageMaker + S3 API client |
+| google-cloud-aiplatform | M7 | GCP Vertex AI client |
 | uv | All | Python package manager (replaces pip + Poetry + pyenv) |
 | FastAPI | All | HTTP API serving |
 | structlog | All | Structured logging |
@@ -763,11 +765,13 @@ An open-source vector database with a GraphQL/REST API, native support for multi
 Now that the environment is set up and the vocabulary is clear, the series builds module by module:
 
 - **Article 1** — Feature pipeline, DuckDB feature store, validation
-- **Article 2** — Propensity model, PyTorch, model card, SageMaker path
+- **Article 2** — Propensity model, PyTorch, model card, TorchScript export
 - **Article 3** — RAG retrieval, pgvector vs. Weaviate benchmark, LangChain vs. LlamaIndex
 - **Article 4** — LLM copy generation, prompt versioning, CLIP brand alignment
 - **Article 5** — LLMOps pipeline, drift monitoring, CI/CD eval gate
 - **Article 6** — RLHF feedback loop, preference datasets, retraining trigger
+- **Article 7** — Integration layer, end-to-end pipeline, SageMaker + Vertex AI cloud deployment
+- **Article 8** — Recap: five lessons, what to build next
 
 Each article is self-contained. The code builds on the previous module but each post explains its inputs and outputs clearly enough that you can start anywhere. If you get stuck on terminology, come back here.
 
