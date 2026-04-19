@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoyaltyLens — Developer Guide & Claude Code Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #1a2744;
+    --brand-mid: #2a3f6f;
+    --accent: #e8a045;
+    --accent-light: #fdf3e3;
+    --teal: #0d9f75;
+    --teal-light: #e0f5ee;
+    --coral: #d94f30;
+    --coral-light: #faeae6;
+    --text: #1c1c1c;
+    --muted: #5a6070;
+    --border: #e2e5ec;
+    --bg: #f9fafb;
+    --white: #ffffff;
+    --code-bg: #f0f2f7;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #0e1a33 0%, #1a3060 40%, #0f2a50 70%, #0a1f3a 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(14,100,180,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 300px at 80% 70%, rgba(232,160,69,0.1) 0%, transparent 70%);
+  }
+  .cover-badge {
+    background: rgba(232,160,69,0.15);
+    border: 1px solid rgba(232,160,69,0.4);
+    color: #e8a045;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 50px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .cover h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.05;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .cover h1 span { color: #e8a045; }
+  .cover-subtitle {
+    font-size: 20px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 40px;
+    font-weight: 300;
+    position: relative;
+  }
+  .cover-meta {
+    display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .cover-meta-item { text-align: center; }
+  .cover-meta-item .label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+  .cover-meta-item .val { font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 500; }
+  .cover-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    position: relative;
+  }
+  .chip {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 400;
+  }
+  .chip.accent { background: rgba(232,160,69,0.12); border-color: rgba(232,160,69,0.3); color: #e8a045; }
+
+  /* ── Layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── TOC ── */
+  .toc-section {
+    background: var(--white);
+    padding: 72px 0 60px;
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  .toc-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-bottom: 40px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .toc-item:hover { border-color: var(--accent); background: var(--accent-light); }
+  .toc-num {
+    width: 32px; height: 32px;
+    background: var(--brand);
+    color: #fff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .toc-title { font-size: 14px; font-weight: 500; line-height: 1.3; }
+
+  /* ── Sections ── */
+  .content-section { padding: 80px 0; border-top: 1px solid var(--border); }
+  .content-section:nth-child(even) { background: var(--white); }
+
+  .section-header { margin-bottom: 40px; }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-top: 8px;
+    line-height: 1.2;
+  }
+  .section-header p {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 640px;
+    line-height: 1.7;
+  }
+
+  /* ── Callout / Info boxes ── */
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-light);
+    padding: 18px 22px;
+    border-radius: 0 10px 10px 0;
+    margin: 28px 0;
+  }
+  .callout.teal { border-left-color: var(--teal); background: var(--teal-light); }
+  .callout.coral { border-left-color: var(--coral); background: var(--coral-light); }
+  .callout strong { font-weight: 600; color: var(--brand); }
+  .callout p { font-size: 15px; color: var(--muted); margin-top: 6px; }
+
+  /* ── Module cards ── */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .module-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .module-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+  .module-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 50px;
+    margin-bottom: 12px;
+  }
+  .tag-blue { background: #e6f1fb; color: #185fa5; }
+  .tag-green { background: #eaf3de; color: #3b6d11; }
+  .tag-amber { background: #faeeda; color: #854f0b; }
+  .tag-coral { background: var(--coral-light); color: var(--coral); }
+  .tag-purple { background: #eeedfe; color: #534ab7; }
+  .module-card h3 { font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 8px; }
+  .module-card p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--brand);
+    border-radius: 10px;
+    padding: 24px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c5cfe8;
+  }
+  code.inline {
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #d94f30;
+  }
+
+  /* ── Data flow ── */
+  .flow-list { list-style: none; margin: 24px 0; }
+  .flow-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-list li:last-child { border-bottom: none; }
+  .flow-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .flow-list li .content h4 { font-size: 15px; font-weight: 600; color: var(--brand); }
+  .flow-list li .content p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Tables ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .data-table th {
+    background: var(--brand);
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--bg); }
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+
+  /* ── Prompt box ── */
+  .prompt-box {
+    background: #0e1a33;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+  .prompt-header {
+    background: rgba(255,255,255,0.05);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .prompt-header span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .prompt-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .prompt-body {
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #a8b8d8;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .prompt-body .kw { color: #e8a045; }
+  .prompt-body .str { color: #7ec8a4; }
+  .prompt-body .cm { color: #5a7090; }
+
+  /* ── PSI Table ── */
+  .psi-row-ok td:first-child { color: var(--teal); font-weight: 600; }
+  .psi-row-warn td:first-child { color: #c07a00; font-weight: 600; }
+  .psi-row-crit td:first-child { color: var(--coral); font-weight: 600; }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 32px 0;
+  }
+  .stat-cell {
+    background: var(--white);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--brand); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* ── Level 4 domain cards ── */
+  .domain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
+  .domain-card {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--white);
+  }
+  .domain-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .domain-card h3 { font-size: 15px; font-weight: 600; color: var(--brand); margin-bottom: 6px; }
+  .domain-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Transition table ── */
+  .transition-table td:first-child { font-weight: 500; color: var(--brand); white-space: nowrap; }
+  .transition-table .before { color: var(--coral); font-size: 13px; }
+  .transition-table .after { color: var(--teal); font-size: 13px; }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--brand);
+    color: rgba(255,255,255,0.7);
+    padding: 48px 0;
+    text-align: center;
+  }
+  .footer h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; margin-bottom: 8px; }
+  .footer p { font-size: 14px; margin-bottom: 4px; }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); margin: 0; }
+
+  /* ── Print ── */
+  @media print {
+    .cover { min-height: auto; padding: 40px; }
+    pre { background: #f0f2f7; color: var(--text); }
+    .prompt-body { color: var(--text); background: #f0f2f7; }
+    .prompt-box { background: #f0f2f7; }
+    .prompt-header { background: #e0e4ee; border-bottom: 1px solid var(--border); }
+    .prompt-header span { color: var(--muted); }
+    .data-table th { background: var(--brand); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 600px) {
+    .cover h1 { font-size: 36px; }
+    .cover-meta { gap: 20px; }
+    .page { padding: 0 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ COVER ══════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Developer Guide &amp; Playbook</div>
+  <h1>Loyalty<span>Lens</span></h1>
+  <p class="cover-subtitle">An LLMOps-Powered Offer Intelligence Platform</p>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Architect</div>
+      <div class="val">Pushparajan Ramar</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Role</div>
+      <div class="val">Enterprise Architect Director</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Primary Tool</div>
+      <div class="val">Claude Code</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Services</div>
+      <div class="val">10 Microservices</div>
+    </div>
+  </div>
+
+  <div class="cover-chips">
+    <span class="chip accent">Python 3.11+ · FastAPI</span>
+    <span class="chip">Node.js · NestJS · TypeScript</span>
+    <span class="chip">Kafka · Event-Driven</span>
+    <span class="chip">AWS ECS/EKS · SageMaker</span>
+    <span class="chip accent">Multi-tenant SaaS</span>
+    <span class="chip">pgvector · Weaviate · Redis</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════ TABLE OF CONTENTS ══════════════════════════ -->
+<div class="toc-section">
+  <div class="page">
+    <div class="section-eyebrow">Contents</div>
+    <h2>What's inside this guide</h2>
+    <div class="toc-grid">
+      <a href="#architecture" class="toc-item"><div class="toc-num" style="background:#1a3060">1</div><div class="toc-title">Architecture Overview</div></a>
+      <a href="#enterprise" class="toc-item"><div class="toc-num" style="background:#1a3060">2</div><div class="toc-title">Enterprise Deployment</div></a>
+      <a href="#bootstrap" class="toc-item"><div class="toc-num" style="background:#0d9f75">3</div><div class="toc-title">Repository Bootstrap</div></a>
+      <a href="#customer" class="toc-item"><div class="toc-num" style="background:#0d9f75">4</div><div class="toc-title">S1 — Customer Service</div></a>
+      <a href="#offer" class="toc-item"><div class="toc-num" style="background:#0d9f75">5</div><div class="toc-title">S2 — Offer Engine</div></a>
+      <a href="#segmentation" class="toc-item"><div class="toc-num" style="background:#e8a045">6</div><div class="toc-title">S3 — Segmentation Engine</div></a>
+      <a href="#campaign" class="toc-item"><div class="toc-num" style="background:#e8a045">7</div><div class="toc-title">S4 — Campaign Orchestration</div></a>
+      <a href="#llmops" class="toc-item"><div class="toc-num" style="background:#e8a045">8</div><div class="toc-title">S5 — LLMOps Pipeline</div></a>
+      <a href="#rlhf" class="toc-item"><div class="toc-num" style="background:#d94f30">9</div><div class="toc-title">S6 — RLHF Feedback Loop</div></a>
+      <a href="#offer-api" class="toc-item"><div class="toc-num" style="background:#d94f30">10</div><div class="toc-title">S7 — Offer Intelligence API</div></a>
+      <a href="#analytics" class="toc-item"><div class="toc-num" style="background:#d94f30">11</div><div class="toc-title">S8 — Analytics Service</div></a>
+      <a href="#security" class="toc-item"><div class="toc-num" style="background:#534ab7">12</div><div class="toc-title">S9 — Security &amp; RBAC</div></a>
+      <a href="#infra" class="toc-item"><div class="toc-num" style="background:#534ab7">13</div><div class="toc-title">S10 — Infrastructure &amp; IaC</div></a>
+      <a href="#level4" class="toc-item"><div class="toc-num" style="background:#534ab7">14</div><div class="toc-title">Level 4 — Autonomous AI</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ STATS ══════════════════════════ -->
+<div style="background: var(--brand); padding: 0;">
+  <div class="page">
+    <div class="stats-bar" style="margin: 0; border-radius: 0; background: rgba(255,255,255,0.06); border: none;">
+      <div class="stat-cell" style="background: transparent;">
+        <div class="stat-num" style="color:#e8a045">10</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">Microservices</div>
+      </div>
+      <div class="stat-cell" style="background: transparent;">
+        <div class="stat-num" style="color:#e8a045">15</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">Claude Code Prompts</div>
+      </div>
+      <div class="stat-cell" style="background: transparent;">
+        <div class="stat-num" style="color:#e8a045">67</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">Level 4 Capabilities</div>
+      </div>
+      <div class="stat-cell" style="background: transparent;">
+        <div class="stat-num" style="color:#e8a045">99</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">Level 3 Capabilities</div>
+      </div>
+      <div class="stat-cell" style="background: transparent;">
+        <div class="stat-num" style="color:#e8a045">5</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">Delivery Channels</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 1 — ARCHITECTURE ══════════════════════════ -->
+<div class="content-section" id="architecture">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 1</div>
+      <h2>Architecture Overview</h2>
+      <p>LoyaltyLens is a full-stack, production-grade loyalty platform built as ten independently deployable microservices. Each service maps to one of the 15 Claude Code prompts — build them incrementally and compose the system progressively.</p>
+    </div>
+
+    <div class="module-grid">
+      <div class="module-card">
+        <span class="module-tag tag-blue">S1</span>
+        <h3>Customer Service</h3>
+        <p>Customer profiles, segmentation data, identity management, event ingestion</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-green">S2</span>
+        <h3>Offer Engine</h3>
+        <p>Offer creation, eligibility rules engine, budget enforcement, redemption tracking</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-amber">S3</span>
+        <h3>Segmentation Engine</h3>
+        <p>Dynamic customer grouping, rule-based + ML segmentation, real-time qualification</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-coral">S4</span>
+        <h3>Campaign Orchestration</h3>
+        <p>Multi-step journeys, trigger-based workflows, state machine, channel coordination</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-purple">S5</span>
+        <h3>Personalization Engine</h3>
+        <p>Next-best-action, real-time ranking, rule + model-based decisions</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-blue">S6</span>
+        <h3>LLMOps Pipeline</h3>
+        <p>Prompt versioning, eval harness, drift monitor, audit logging, CI/CD for ML</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-green">S7</span>
+        <h3>RLHF Feedback Loop</h3>
+        <p>Event-driven feedback capture, preference dataset, retraining trigger, RLHF fine-tuning</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-amber">S8</span>
+        <h3>Analytics Service</h3>
+        <p>KPI tracking, funnel analysis, cohort analysis, aggregation pipelines</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-coral">S9</span>
+        <h3>Security &amp; RBAC</h3>
+        <p>JWT authentication, RBAC + ABAC middleware, policy enforcement, audit logging</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-purple">S10</span>
+        <h3>Infrastructure / IaC</h3>
+        <p>Terraform (ECS/EKS, RDS, MSK, API Gateway), CI/CD pipeline, multi-tenant deployment</p>
+      </div>
+    </div>
+
+    <div class="callout teal" style="margin-top: 36px;">
+      <strong>Data Flow</strong>
+      <p>Customer Events → Feature Pipeline (Pandas/DuckDB) → Feature Store → Propensity Scorer (PyTorch) → RAG Retrieval (LangChain + pgvector) → LLM Copy Generator → Personalization Engine → Offer Engine → Campaign Orchestration → LLMOps → RLHF Feedback → Kafka → Analytics</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 2 — ENTERPRISE ══════════════════════════ -->
+<div class="content-section" id="enterprise">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 2</div>
+      <h2>Enterprise Deployment Architecture</h2>
+      <p>LoyaltyLens operates as a private SaaS platform: the runtime executes entirely within the client's cloud boundary, while a vendor-owned control plane handles licensing, updates, AI governance, and observability metadata.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Layer</th><th>Ownership</th><th>Responsibilities</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Control Plane</strong></td>
+            <td>Vendor</td>
+            <td>Tenant provisioning, licensing, feature flags, release orchestration, AI model registry &amp; governance, observability metadata, JIT support access</td>
+          </tr>
+          <tr>
+            <td><strong>Runtime Plane</strong></td>
+            <td>Client VPC</td>
+            <td>All PII and transaction data processing, API gateway, loyalty orchestration, offer engine, points ledger, profile service, AI personalization inference, operational databases, audit logging</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Positioning Statement</strong>
+      <p>"Private SaaS loyalty platform with AI-driven personalisation, deployed in your cloud with continuous innovation and zero data compromise."</p>
+    </div>
+
+    <h3 style="font-size: 18px; font-weight: 600; color: var(--brand); margin: 32px 0 16px;">Security Architecture</h3>
+    <ul style="list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;">
+      <li style="padding: 16px 18px; background: var(--teal-light); border-radius: 10px; border-left: 4px solid var(--teal);">
+        <strong style="font-size: 13px; color: var(--brand);">AES-256 at rest</strong>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">All operational and ledger databases with BYOK (Bring Your Own Key)</p>
+      </li>
+      <li style="padding: 16px 18px; background: var(--teal-light); border-radius: 10px; border-left: 4px solid var(--teal);">
+        <strong style="font-size: 13px; color: var(--brand);">mTLS in transit</strong>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">TLS 1.3 minimum on all inter-service and client-to-API communication</p>
+      </li>
+      <li style="padding: 16px 18px; background: var(--teal-light); border-radius: 10px; border-left: 4px solid var(--teal);">
+        <strong style="font-size: 13px; color: var(--brand);">Zero-trust network</strong>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">All service-to-service calls authenticated even within the VPC</p>
+      </li>
+      <li style="padding: 16px 18px; background: var(--teal-light); border-radius: 10px; border-left: 4px solid var(--teal);">
+        <strong style="font-size: 13px; color: var(--brand);">RBAC + ABAC</strong>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Role-based + attribute-based policies for fine-grained data access</p>
+      </li>
+    </ul>
+
+    <h3 style="font-size: 18px; font-weight: 600; color: var(--brand); margin: 32px 0 16px;">AI Governance Modes</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Mode</th><th>Description</th><th>Default?</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Isolated AI</strong></td><td>Per-tenant model; no cross-tenant inference or training; full data isolation</td><td><span class="module-tag tag-green" style="margin:0">Default</span></td></tr>
+          <tr><td><strong>Federated Learning</strong></td><td>Model gradients shared across tenants; raw data never moves; patterns improve globally</td><td><span class="module-tag tag-amber" style="margin:0">Opt-in</span></td></tr>
+          <tr><td><strong>Shared Intelligence</strong></td><td>Opt-in aggregated insights from anonymised cross-tenant signals; industry benchmarks returned</td><td><span class="module-tag tag-coral" style="margin:0">Opt-in</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 3 — BOOTSTRAP ══════════════════════════ -->
+<div class="content-section" id="bootstrap">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 3</div>
+      <h2>Repository Bootstrap</h2>
+      <p>The monorepo structure and master Claude Code prompts to kick off every session with the correct architecture context.</p>
+    </div>
+
+    <div class="callout teal">
+      <strong>Master Context Prompt (Prompt 0)</strong>
+      <p>Paste this as the opening context in every Claude Code session. It sets the architecture, constraints, and output format that all subsequent service prompts depend on.</p>
+    </div>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <div class="prompt-dot" style="background:#ff5f57"></div>
+        <div class="prompt-dot" style="background:#febc2e"></div>
+        <div class="prompt-dot" style="background:#28c840"></div>
+        <span>Master Context — All Sessions</span>
+      </div>
+      <div class="prompt-body"><span class="kw">MASTER CONTEXT</span> — LoyaltyLens Loyalty Platform
+
+You are a senior staff engineer building an enterprise-grade loyalty platform.
+
+<span class="kw">ARCHITECTURE:</span>
+- Microservices, API-first
+- Backend: <span class="str">Python (FastAPI) or Node.js (NestJS)</span>
+- Frontend: <span class="str">Next.js</span>
+- Data: <span class="str">PostgreSQL + Redis</span>
+- Eventing: <span class="str">Kafka (or AWS Kinesis)</span>
+
+<span class="kw">NON-FUNCTIONAL REQUIREMENTS:</span>
+- Multi-tenant (tenant_id enforced everywhere)
+- Secure (RBAC, PII safe)
+- Scalable (stateless services)
+- Observable (logs, metrics, tracing)
+
+<span class="kw">OUTPUT FORMAT:</span>
+1. Architecture summary
+2. Folder structure  3. Code (modular)
+4. API contracts     5. Test cases</div>
+    </div>
+
+    <h3 style="font-size: 18px; font-weight: 600; color: var(--brand); margin: 32px 0 16px;">Monorepo Structure</h3>
+    <pre>loyaltylens/
+├── customer_service/       <span style="color:#5a7090"># S1 — Customer profiles + event ingestion</span>
+├── offer_engine/           <span style="color:#5a7090"># S2 — Offer creation, rules, redemption</span>
+├── segmentation_engine/    <span style="color:#5a7090"># S3 — Dynamic segmentation</span>
+├── campaign_service/       <span style="color:#5a7090"># S4 — Campaign orchestration + journeys</span>
+├── personalization_engine/ <span style="color:#5a7090"># S5 — Next-best-action + real-time ranking</span>
+├── llmops/                 <span style="color:#5a7090"># S6 — Prompt versioning, eval harness, drift</span>
+│   ├── prompt_registry/
+│   ├── eval_harness/
+│   └── drift_monitor/
+├── feedback_service/       <span style="color:#5a7090"># S7 — RLHF feedback + preference dataset</span>
+├── analytics_service/      <span style="color:#5a7090"># S8 — KPI tracking, funnel, cohort analysis</span>
+├── security/               <span style="color:#5a7090"># S9 — JWT, RBAC middleware, audit logging</span>
+├── infra/                  <span style="color:#5a7090"># S10 — Terraform, CI/CD, environment configs</span>
+├── loyaltylens-web/        <span style="color:#5a7090"># Next.js frontend (Prompt 11)</span>
+├── design/                 <span style="color:#5a7090"># Figma token sync + frame exports</span>
+└── shared/                 <span style="color:#5a7090"># Config, logging, Kafka clients, schemas</span></pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 4-8 — SERVICES ══════════════════════════ -->
+<div class="content-section" id="customer">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 4 · S1</div>
+      <h2>Customer Service — Feature Pipeline</h2>
+      <p>Mirrors real-time feature pipelines, CDP behavioral signals, and Databricks batch jobs. Generates 50,000 synthetic loyalty events and computes RFM + engagement features.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">What to build</h3>
+    <ul class="flow-list">
+      <li><div class="flow-num">1</div><div class="content"><h4>Data Generator</h4><p>50,000 synthetic loyalty customer event records (purchases, app opens, offer views, redemptions) saved as Parquet</p></div></li>
+      <li><div class="flow-num">2</div><div class="content"><h4>Feature Engineering</h4><p>Compute: recency, frequency, monetary (RFM), offer_affinity_score, channel_preference, 30-day rolling engagement</p></div></li>
+      <li><div class="flow-num">3</div><div class="content"><h4>DuckDB Feature Store</h4><p>Versioned tables: features_v1, features_v2 — enabling feature lineage tracking</p></div></li>
+      <li><div class="flow-num">4</div><div class="content"><h4>FastAPI Serving Endpoint</h4><p><code class="inline">GET /features/{customer_id}</code> — returns latest feature vector in JSON</p></div></li>
+    </ul>
+  </div>
+</div>
+
+<div class="content-section" id="offer">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 5 · S2</div>
+      <h2>Offer Engine — Propensity Scoring</h2>
+      <p>A PyTorch tabular transformer (TabTransformer-lite) trained on feature store output to predict offer redemption probability, with MLflow tracking and a SageMaker stretch goal.</p>
+    </div>
+
+    <div class="callout">
+      <strong>Model Architecture</strong>
+      <p>Input (6 features) → Linear(6→64) + LayerNorm → TransformerEncoder (2 layers, d_model=64, nhead=4) → MLP: Linear(64→32) → ReLU → Dropout(0.1) → Linear(32→1) → Sigmoid → propensity_score [0, 1]</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 24px 0 12px;">Key files</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>File</th><th>Purpose</th><th>Key Class</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline">propensity_model/model.py</code></td><td>TabTransformer-lite</td><td>TabTransformerModel</td></tr>
+          <tr><td><code class="inline">propensity_model/train.py</code></td><td>Training + MLflow</td><td>TrainingJob</td></tr>
+          <tr><td><code class="inline">propensity_model/predictor.py</code></td><td>Inference wrapper</td><td>PropensityPredictor</td></tr>
+          <tr><td><code class="inline">propensity_model/api.py</code></td><td>FastAPI serving</td><td>POST /predict</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="segmentation">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 6 · S3</div>
+      <h2>Segmentation Engine — RAG Offer Retrieval</h2>
+      <p>200 synthetic loyalty offers embedded with HuggingFace sentence-transformers, stored in both pgvector and Weaviate, with LangChain and LlamaIndex retrieval chains benchmarked side-by-side.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">Vector DB Decision Matrix</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Criterion</th><th>pgvector</th><th>Weaviate</th></tr></thead>
+        <tbody>
+          <tr><td>Setup complexity</td><td>Low (Postgres extension)</td><td>Medium (separate service)</td></tr>
+          <tr><td>Query language</td><td>SQL + &lt;-&gt; operator</td><td>GraphQL / REST</td></tr>
+          <tr><td>Filtering</td><td>Standard SQL WHERE</td><td>Native where filters</td></tr>
+          <tr><td>Best for</td><td>Existing Postgres stack</td><td>Dedicated vector workloads</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="campaign">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 7 · S4</div>
+      <h2>Campaign Orchestration — LLM Copy Generator</h2>
+      <p>A prompt template registry (YAML) with versioned prompts, LLM backends (HuggingFace / OpenAI-compatible), and a CLIP-based brand image scorer for GenAI content alignment.</p>
+    </div>
+
+    <div class="callout coral">
+      <strong>Prompt Version Control</strong>
+      <p>Each YAML file is the source of truth — commit all prompt changes to Git. <code class="inline">prompt_version</code> is logged with every inference record (critical for drift analysis). Never hardcode prompts inline — always load from the registry at runtime.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 24px 0 12px;">Output OfferCopy dataclass</h3>
+    <pre>@dataclass
+class OfferCopy:
+    headline: str        <span style="color:#5a7090"># e.g. "Earn double stars this weekend!"</span>
+    body: str            <span style="color:#5a7090"># max 40 words</span>
+    cta: str             <span style="color:#5a7090"># "Redeem now" / "Shop today"</span>
+    tone: str            <span style="color:#5a7090"># friendly | urgent | exclusive</span>
+    model_version: str
+    prompt_version: str
+    latency_ms: float
+    token_count: int</pre>
+  </div>
+</div>
+
+<div class="content-section" id="llmops">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 8 · S5</div>
+      <h2>LLMOps Pipeline — Eval, Drift &amp; CI/CD</h2>
+      <p>Production LLMOps with prompt versioning registry, automated eval harness (BLEU + ROUGE + LLM-as-judge), PSI drift monitoring, and a GitHub Actions CI/CD pipeline with eval gate.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">Eval Score Composition</h3>
+    <pre>aggregate_score = (
+  0.20 * bleu_score          <span style="color:#5a7090"># lexical overlap</span>
+  + 0.20 * rouge_l_score     <span style="color:#5a7090"># recall-oriented overlap</span>
+  + 0.20 * coherence / 5     <span style="color:#5a7090"># LLM judge: logical flow</span>
+  + 0.20 * brand_alignment / 5  <span style="color:#5a7090"># LLM judge: brand voice</span>
+  + 0.20 * cta_strength / 5  <span style="color:#5a7090"># LLM judge: call-to-action</span>
+)
+<span style="color:#e8a045"># CI gate: blocks merge if aggregate_score &lt; 0.75</span></pre>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 28px 0 16px;">PSI Drift Monitor</h3>
+    <div class="table-wrap">
+      <table class="data-table transition-table">
+        <thead><tr><th>PSI Value</th><th>Status</th><th>Recommended Action</th></tr></thead>
+        <tbody>
+          <tr class="psi-row-ok"><td>&lt; 0.1</td><td>OK — stable</td><td>No action needed</td></tr>
+          <tr class="psi-row-warn"><td>0.1 – 0.2</td><td>Warning — minor shift</td><td>Investigate feature distribution</td></tr>
+          <tr class="psi-row-crit"><td>&gt; 0.2</td><td>Critical — significant drift</td><td>Trigger retraining pipeline</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 9 — RLHF ══════════════════════════ -->
+<div class="content-section" id="rlhf">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 9 · S6</div>
+      <h2>RLHF Feedback Loop</h2>
+      <p>A React + FastAPI feedback UI with thumbs up/down and star rating, preference dataset builder (JSONL for OpenAI fine-tuning), and automated retraining triggers via GitHub Actions webhooks.</p>
+    </div>
+
+    <div class="callout coral">
+      <strong>Retraining Trigger Logic</strong>
+      <p>7-day rolling window evaluated nightly. If <code class="inline">avg_rating &lt; 3.0</code> → CRITICAL drift in offer quality → retrain propensity model. If <code class="inline">thumbs_down_rate &gt; 0.40</code> → CRITICAL copy degradation → run eval harness and force prompt rollback if eval &lt; 0.75.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 24px 0 12px;">Preference Dataset Format</h3>
+    <pre><span style="color:#5a7090">// feedback_loop/data/preference_dataset.jsonl</span>
+{
+  <span style="color:#7ec8a4">"prompt"</span>: <span style="color:#a8b8d8">"Customer tier: Gold. Offer: Free cookie..."</span>,
+  <span style="color:#7ec8a4">"chosen"</span>: <span style="color:#a8b8d8">"Treat yourself — enjoy a free cookie on us! Redeem in-app."</span>,
+  <span style="color:#7ec8a4">"rejected"</span>: <span style="color:#a8b8d8">"Get cookie. Use app. Today only."</span>
+}</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 10 — OFFER API ══════════════════════════ -->
+<div class="content-section" id="offer-api">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 10 · S7</div>
+      <h2>Offer Intelligence API</h2>
+      <p>15 typed offer endpoints across 4 tech classifications, with multi-channel content variants per offer (web, mobile, in-app, push, email) and a parallel best-offer orchestrator returning the winner in &lt;100ms p99.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">Tech Classification Mapping</h3>
+    <div class="module-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+      <div class="module-card">
+        <span class="module-tag tag-blue">Financial Incentive</span>
+        <p>percentage_discount, fixed_discount, free_shipping, bundle_pricing, financing_offer</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-green">Retention &amp; Continuity</span>
+        <p>loyalty_points_redemption, tier_based_offer, subscription_discount, referral_bonus</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-amber">Behavioral Nudge</span>
+        <p>abandoned_cart_offer, browse_abandonment_offer, win_back_offer, first_time_buyer_offer</p>
+      </div>
+      <div class="module-card">
+        <span class="module-tag tag-purple">Content AI Personalisation</span>
+        <p>personalized_bundle_offer, dynamic_ai_offer</p>
+      </div>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 32px 0 16px;">Channel Content Model</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Channel</th><th>Key Fields</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Web</strong></td><td>headline, subheadline, body, cta_label, cta_url, badge_text, image_ref</td><td>headline ≤60 chars; badge_text ≤15 chars</td></tr>
+          <tr><td><strong>Mobile</strong></td><td>headline, body, cta_label, cta_deep_link, image_ref</td><td>headline ≤45 chars; deep link URI loyaltylens://offers/</td></tr>
+          <tr><td><strong>In-App</strong></td><td>headline, body, cta_label, cta_action, dismiss_label, modal_type, image_ref</td><td>modal_type: banner | modal | bottom_sheet | tooltip</td></tr>
+          <tr><td><strong>Push</strong></td><td>title, body, cta_deep_link, image_ref, collapse_key</td><td>title ≤50 chars; body ≤100 chars; image 2:1 ratio</td></tr>
+          <tr><td><strong>Email</strong></td><td>subject, preheader, headline, body_html, body_plain, cta_label, cta_url, image_refs, unsubscribe_tag</td><td>body_html uses inline CSS only (Gmail strips &lt;style&gt;)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin: 32px 0 16px;">Performance SLAs</h3>
+    <div class="stats-bar" style="margin: 0 0 32px;">
+      <div class="stat-cell"><div class="stat-num" style="font-size:28px;color:var(--teal)">&lt;100ms</div><div class="stat-label">Offer p99</div></div>
+      <div class="stat-cell"><div class="stat-num" style="font-size:28px;color:var(--teal)">&lt;10ms</div><div class="stat-label">Feature p99</div></div>
+      <div class="stat-cell"><div class="stat-num" style="font-size:28px;color:var(--teal)">&lt;2s</div><div class="stat-label">LLM Copy p95</div></div>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">Image Generation Models</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Model</th><th>Best for</th><th>License</th><th>Config key</th></tr></thead>
+        <tbody>
+          <tr><td><strong>GLM-ImageAR</strong></td><td>Dense text overlays, menus, poster-style offers</td><td>Open Weight</td><td><code class="inline">glm_imagear</code></td></tr>
+          <tr><td><strong>Qwen-Image</strong></td><td>Multilingual text, consistent brand fonts</td><td>Apache 2.0</td><td><code class="inline">qwen_image</code></td></tr>
+          <tr><td><strong>Z-Image-Turbo</strong></td><td>Fast inference, push + mobile thumbnails</td><td>Apache 2.0</td><td><code class="inline">z_image_turbo</code></td></tr>
+          <tr><td><strong>Stable Diffusion 3.5</strong></td><td>Web + email hero images — versatile default</td><td>Open Source</td><td><code class="inline">sd35</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 11-13 ══════════════════════════ -->
+<div class="content-section" id="analytics">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 11 · S8</div>
+      <h2>Analytics Service</h2>
+      <p>Real-time KPI tracking, funnel analysis, cohort analysis, and aggregation pipelines with Kafka consumer writing events from all offer interactions to pre-computed materialized views.</p>
+    </div>
+    <ul class="flow-list">
+      <li><div class="flow-num">KPI</div><div class="content"><h4>KPI Tracking</h4><p>Conversion rate, redemption rate, revenue per offer, CTR per channel</p></div></li>
+      <li><div class="flow-num">F</div><div class="content"><h4>Funnel Analysis</h4><p>Delivery → View → Click → Redemption → Repeat Purchase</p></div></li>
+      <li><div class="flow-num">C</div><div class="content"><h4>Cohort Analysis</h4><p>Groups by acquisition date, tier, or segment; tracks retention and LTV over time</p></div></li>
+      <li><div class="flow-num">K</div><div class="content"><h4>Kafka Consumer</h4><p>Consumes: OfferDelivered, OfferViewed, OfferRedeemed, CustomerConverted</p></div></li>
+    </ul>
+  </div>
+</div>
+
+<div class="content-section" id="security">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 12 · S9</div>
+      <h2>Security &amp; RBAC Layer</h2>
+      <p>JWT authentication middleware (RS256), RBAC + ABAC policy engine, tamper-evident audit logs, PII field masking, and tenant isolation enforcement on every database query.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Role</th><th>Permissions (summary)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Admin</strong></td><td>Full access — all services, all tenants, user management, audit log access</td></tr>
+          <tr><td><strong>Marketer</strong></td><td>Create/edit offers and campaigns, view analytics, manage segments</td></tr>
+          <tr><td><strong>Analyst</strong></td><td>Read-only analytics, KPI dashboards, cohort reports</td></tr>
+          <tr><td><strong>ReadOnly</strong></td><td>View offer catalog, customer summary stats — no PII access</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="content-section" id="infra">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 13 · S10</div>
+      <h2>Infrastructure &amp; IaC</h2>
+      <p>Terraform modules for ECS/EKS, RDS Multi-AZ, MSK Kafka, ElastiCache Redis, and API Gateway — with full GitHub Actions CI/CD, ECR image management, and per-environment tfvars.</p>
+    </div>
+
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--brand); margin-bottom: 16px;">Service Port Reference</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>customer_service</strong> — :8001</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>offer_engine</strong> — :8002</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>segmentation_engine</strong> — :8003</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>campaign_service</strong> — :8004</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>personalization_engine</strong> — :8005</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>llmops</strong> — :8006</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>feedback_service</strong> — :8007</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>analytics_service</strong> — :8008</div>
+      <div style="padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;"><strong>loyaltylens-web</strong> — :3000</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SECTION 14 — LEVEL 4 ══════════════════════════ -->
+<div class="content-section" id="level4">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 14 · Level 4</div>
+      <h2>Autonomous Loyalty Intelligence</h2>
+      <p>Level 3 LoyaltyLens is a tool marketers operate. Level 4 is a self-optimising decision system marketers supervise. 67 capabilities across 10 domains define the additional layer required to reach that state.</p>
+    </div>
+
+    <div class="domain-grid">
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--teal-light)">🤖</div>
+        <h3>Autonomous Decisioning</h3>
+        <p>10 capabilities — next-best-action selection, real-time budget reallocation, continuous decisioning engine</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--accent-light)">🎯</div>
+        <h3>Goal-Driven Optimisation</h3>
+        <p>8 capabilities — goal-to-strategy translation, KPI alignment, guardrail-based marketer interface</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:#eeedfe">🧪</div>
+        <h3>Autonomous Experimentation</h3>
+        <p>7 capabilities — continuous test generation, explore-exploit balancing, automated statistical rigour</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--coral-light)">🔮</div>
+        <h3>Predictive Intelligence</h3>
+        <p>7 capabilities — forward-looking behaviour prediction, proactive churn/upsell detection</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--teal-light)">🛡️</div>
+        <h3>Self-Healing &amp; Resilience</h3>
+        <p>6 capabilities — performance degradation detection, channel failure isolation, circuit breakers</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:#eaf3de">📋</div>
+        <h3>Trust &amp; Explainability</h3>
+        <p>7 capabilities — audit-ready decision logs, hard constraint enforcement, fairness &amp; bias prevention</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--accent-light)">👤</div>
+        <h3>Human-in-the-Loop</h3>
+        <p>6 capabilities — strategy simulation environment, what-if scenario analysis, high-stakes approval workflows</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:#eeedfe">🔄</div>
+        <h3>Continuous Learning</h3>
+        <p>6 capabilities — cross-channel learning, delayed outcome incorporation, institutional knowledge retention</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--teal-light)">💹</div>
+        <h3>Economic Optimisation</h3>
+        <p>5 capabilities — profit-first optimisation, incremental value allocation, over-discounting prevention</p>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon" style="background:var(--coral-light)">📡</div>
+        <h3>Channel &amp; Experience Autonomy</h3>
+        <p>4 capabilities — autonomous channel selection, dynamic timing, journey-free cross-channel coordination</p>
+      </div>
+    </div>
+
+    <h3 style="font-size: 18px; font-weight: 600; color: var(--brand); margin: 40px 0 16px;">Level 3 → Level 4 Transition</h3>
+    <div class="table-wrap">
+      <table class="data-table transition-table">
+        <thead><tr><th>Dimension</th><th>Level 3</th><th>Level 4</th></tr></thead>
+        <tbody>
+          <tr><td>Human role</td><td class="before">Marketer configures segments, offers, and journeys</td><td class="after">Marketer defines goals and constraints only</td></tr>
+          <tr><td>Optimisation</td><td class="before">Manual campaign tuning</td><td class="after">Continuous autonomous re-optimisation</td></tr>
+          <tr><td>Experimentation</td><td class="before">Analyst-run A/B tests</td><td class="after">Self-directed bandit learning</td></tr>
+          <tr><td>Failure handling</td><td class="before">Incident response by engineers</td><td class="after">Automated self-healing and fallback</td></tr>
+          <tr><td>Model updates</td><td class="before">Scheduled retraining projects</td><td class="after">Interaction-driven continuous learning</td></tr>
+          <tr><td>Explainability</td><td class="before">Model-level technical logs</td><td class="after">Business-level plain-language audit trail</td></tr>
+          <tr><td>Budget control</td><td class="before">Manual allocation per campaign</td><td class="after">Autonomous real-time reallocation within guardrails</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top: 32px;">
+      <strong>Technical Foundation Required for Level 4</strong>
+      <p>Four foundations must all be strong simultaneously: (1) Reinforcement learning / bandit systems, (2) Causal inference — not just correlation, (3) Strict guardrail enforcement, (4) Business-level explainability. If any one is absent, autonomous operation becomes untrustworthy.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<div class="footer">
+  <div class="page">
+    <h3>LoyaltyLens</h3>
+    <p>An LLMOps-Powered Offer Intelligence Platform</p>
+    <p style="margin-top: 12px;">Built with <strong style="color:var(--accent)">Claude Code</strong> · Pushparajan Ramar · <a href="https://pushparajan.tech">pushparajan.tech</a></p>
+    <p style="margin-top: 24px; font-size: 12px; color: rgba(255,255,255,0.35);">Enterprise Architect Director · 10 Microservices · 15 Claude Code Prompts · 99 Level 3 Capabilities · 67 Level 4 Capabilities</p>
+  </div>
+</div>
+
+</body>
+</html>
